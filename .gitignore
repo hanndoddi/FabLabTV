@@ -6,6 +6,9 @@ node_modules/
 data/runtime.json
 data/globalPulseCache.json
 
+# Local runtime settings managed from the Remote screen.
+data/userSettings.json
+
 # Keep the folders in Git via .gitkeep, but ignore uploaded user media by default.
 videos/*
 !videos/.gitkeep
