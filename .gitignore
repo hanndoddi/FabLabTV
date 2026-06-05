@@ -25,3 +25,5 @@ data/localPulse.json
 
 # Local video source settings managed from the Remote screen.
 data/videoSources.json
+
+data/staffProfiles.json

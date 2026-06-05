@@ -9,7 +9,9 @@ import { config } from "./config.js";
 const videoSourcesPath = path.join(config.dataDir, "videoSources.json");
 const videoSourcesExamplePath = path.join(config.dataDir, "videoSources.example.json");
 const fabAcademyHighlightsPath = path.join(config.dataDir, "fabAcademyHighlights.json");
+
 const staffProfilesPath = path.join(config.dataDir, "staffProfiles.json");
+const staffProfilesExamplePath = path.join(config.dataDir, "staffProfiles.example.json");
 
 const defaultVideoSources = {
   localVideos: true,
@@ -62,7 +64,9 @@ function normalizeStaffProfiles(value = {}) {
 }
 
 export async function loadStaffProfiles() {
-  return normalizeStaffProfiles(await readJsonFile(staffProfilesPath, {}));
+  const defaultProfiles = await readJsonFile(staffProfilesExamplePath, {});
+  const runtimeProfiles = await readJsonFile(staffProfilesPath, defaultProfiles);
+  return normalizeStaffProfiles(runtimeProfiles);
 }
 
 export async function saveStaffProfiles(value) {
