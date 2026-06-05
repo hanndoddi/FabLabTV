@@ -123,9 +123,26 @@ function updateStaticLabels() {
   if (localPulseLabel) localPulseLabel.textContent = t("localPulse", "Local Pulse");
 }
 
+function getEmptyVideoMessage() {
+  const videoSources = statusCache?.videoSources || {};
+  const openingHours = statusCache?.openingHoursStatus;
+
+  if (
+    videoSources.fabAcademyHighlights &&
+    !videoSources.fabAcademyHighlightsAfterHours &&
+    openingHours?.enabled &&
+    openingHours?.isOpen === false
+  ) {
+    return "Fab Academy Highlights are paused because the lab is currently closed. Enable after-hours highlights in Remote if staff are working late.";
+  }
+
+  return t("addVideosOrStreaming", "Add videos to videos/ or turn on streaming highlights in Remote.");
+}
+
+
 function renderNowPlayingItem(item) {
   if (!item) {
-    nowPlaying.textContent = t("addVideosOrStreaming", "Add videos to videos/ or turn on streaming highlights in Remote.");
+    nowPlaying.textContent = getEmptyVideoMessage();
     return;
   }
 
@@ -189,7 +206,8 @@ function playVideo(index, { force = false, notify = false } = {}) {
     isOneTimeVideo = false;
     video.removeAttribute("src");
     videoEmpty.style.display = "grid";
-    nowPlaying.textContent = t("addVideosOrStreaming", "Add videos to videos/ or turn on streaming highlights in Remote.");
+    videoEmpty.textContent = getEmptyVideoMessage();
+    nowPlaying.textContent = getEmptyVideoMessage();
     return;
   }
 
@@ -491,6 +509,8 @@ function renderStatus(status) {
     const currentItem = status.videos?.find((item) => item.url === currentVideoUrl);
     if (currentItem) {
       renderNowPlayingItem(currentItem);
+    } else {
+      playVideo(status.currentVideoIndex || 0, { force: true });
     }
   }
 }

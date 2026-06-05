@@ -18,7 +18,7 @@ import { config } from "./config.js";
 import { getVideoLibrary, getStaffLibrary, loadVideoSourcesConfig, saveVideoSourcesConfig, getFabAcademyHighlightsSummary, getFabAcademyHighlightById, updateStaffProfile, deleteStaffProfile } from "./library.js";
 import { loadState, saveState } from "./state.js";
 import { getGlobalPulse, startGlobalPulseRefresh } from "./globalPulse.js";
-import { getLocalPulse, loadLocalPulseConfig, saveLocalPulseConfig } from "./localPulse.js";
+import { getLocalPulse, loadLocalPulseConfig, saveLocalPulseConfig, isLabOpenNow } from "./localPulse.js";
 import { loadI18nConfig, saveI18nConfig, normalizeLanguage } from "./i18n.js";
 
 const app = express();
@@ -153,15 +153,22 @@ function uploadFileToFolder({ directory, allowedExtensions, fallbackBase, afterU
 }
 
 async function buildStatus() {
-  const [videos, staff, state, appConfig, i18n, videoSources, fabAcademyHighlights] = await Promise.all([
-    getVideoLibrary(),
+  const [staff, state, appConfig, i18n, videoSources, fabAcademyHighlights, localPulseConfig] = await Promise.all([
     getStaffLibrary(),
     loadState(),
     loadAppConfig(),
     loadI18nConfig(),
     loadVideoSourcesConfig(),
-    getFabAcademyHighlightsSummary()
+    getFabAcademyHighlightsSummary(),
+    loadLocalPulseConfig()
   ]);
+
+  const openingHoursStatus = isLabOpenNow(
+    localPulseConfig,
+    appConfig.timezone || "Atlantic/Reykjavik"
+  );
+
+  const videos = await getVideoLibrary();
 
   const [globalPulse, localPulse] = await Promise.all([
     getGlobalPulse(appConfig, i18n),
@@ -184,6 +191,7 @@ async function buildStatus() {
     config: appConfig,
     i18n,
     videoSources,
+    openingHoursStatus,
     fabAcademyHighlights,
     videos,
     staff,
@@ -195,7 +203,6 @@ async function buildStatus() {
     news: await getNewsItems(appConfig),
     globalPulse,
     localPulse,
-    // Deprecated compatibility field. Use globalPulse instead.
     labPulse: {
       updatedAt: globalPulse.updatedAt,
       cards: globalPulse.items
