@@ -1,4 +1,7 @@
 {
   "localVideos": true,
-  "fabAcademyHighlights": true
+  "fabAcademyHighlights": false,
+  "fabAcademyHighlightsAfterHours": false,
+  "localVideosPerCycle": 1,
+  "fabAcademyHighlightsPerCycle": 1
 }

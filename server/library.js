@@ -17,7 +17,9 @@ const staffProfilesExamplePath = path.join(config.dataDir, "staffProfiles.exampl
 const defaultVideoSources = {
   localVideos: true,
   fabAcademyHighlights: false,
-  fabAcademyHighlightsAfterHours: false
+  fabAcademyHighlightsAfterHours: false,
+  localVideosPerCycle: 1,
+  fabAcademyHighlightsPerCycle: 1
 };
 
 function stripExtension(filename) {
@@ -102,7 +104,9 @@ function normalizeVideoSourcesConfig(value = {}) {
   return {
     localVideos: value.localVideos !== false,
     fabAcademyHighlights: value.fabAcademyHighlights === true,
-    fabAcademyHighlightsAfterHours: value.fabAcademyHighlightsAfterHours === true
+    fabAcademyHighlightsAfterHours: value.fabAcademyHighlightsAfterHours === true,
+    localVideosPerCycle: Math.max(0, Number(value.localVideosPerCycle) || 1),
+    fabAcademyHighlightsPerCycle: Math.max(0, Number(value.fabAcademyHighlightsPerCycle) || 1)
   };
 }
 
@@ -200,22 +204,43 @@ function shuffleItems(items) {
   return shuffled;
 }
 
-function buildBalancedPlaylist(localVideos, highlightVideos) {
+function buildBalancedPlaylist(localVideos, highlightVideos, options = {}) {
   if (!localVideos.length) return shuffleItems(highlightVideos);
   if (!highlightVideos.length) return shuffleItems(localVideos);
+
+  const localPerCycle = Math.max(0, Number(options.localVideosPerCycle) || 1);
+  const highlightsPerCycle = Math.max(0, Number(options.fabAcademyHighlightsPerCycle) || 1);
+
+  if (!localPerCycle && !highlightsPerCycle) {
+    return [];
+  }
+
+  if (!localPerCycle) {
+    return shuffleItems(highlightVideos);
+  }
+
+  if (!highlightsPerCycle) {
+    return shuffleItems(localVideos);
+  }
 
   const shuffledLocalVideos = shuffleItems(localVideos);
   const shuffledHighlightVideos = shuffleItems(highlightVideos);
   const playlist = [];
-  const maxLength = Math.max(shuffledLocalVideos.length, shuffledHighlightVideos.length);
+  let localIndex = 0;
+  let highlightIndex = 0;
 
-  for (let index = 0; index < maxLength; index += 1) {
-    if (shuffledLocalVideos[index]) {
-      playlist.push(shuffledLocalVideos[index]);
+  while (
+    localIndex < shuffledLocalVideos.length ||
+    highlightIndex < shuffledHighlightVideos.length
+  ) {
+    for (let count = 0; count < localPerCycle && localIndex < shuffledLocalVideos.length; count += 1) {
+      playlist.push(shuffledLocalVideos[localIndex]);
+      localIndex += 1;
     }
 
-    if (shuffledHighlightVideos[index]) {
-      playlist.push(shuffledHighlightVideos[index]);
+    for (let count = 0; count < highlightsPerCycle && highlightIndex < shuffledHighlightVideos.length; count += 1) {
+      playlist.push(shuffledHighlightVideos[highlightIndex]);
+      highlightIndex += 1;
     }
   }
 
@@ -245,7 +270,7 @@ export async function getVideoLibrary() {
       : [];
 
 
-  const videos = buildBalancedPlaylist(localVideos, highlightVideos);
+  const videos = buildBalancedPlaylist(localVideos, highlightVideos, videoSources);
   const signature = getVideoSignature(videos);
 
   if (signature !== shuffledVideoCache.signature) {

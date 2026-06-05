@@ -20,6 +20,8 @@ const videoUploadStatus = document.querySelector("#videoUploadStatus");
 const localVideosEnabled = document.querySelector("#localVideosEnabled");
 const fabHighlightsEnabled = document.querySelector("#fabHighlightsEnabled");
 const fabHighlightsAfterHoursEnabled = document.querySelector("#fabHighlightsAfterHoursEnabled");
+const localVideosPerCycle = document.querySelector("#localVideosPerCycle");
+const fabHighlightsPerCycle = document.querySelector("#fabHighlightsPerCycle");
 const fabVideoSearch = document.querySelector("#fabVideoSearch");
 const fabVideoCatalog = document.querySelector("#fabVideoCatalog");
 const fabPlaylistSummary = document.querySelector("#fabPlaylistSummary");
@@ -242,6 +244,14 @@ function renderVideoSources(status) {
   if (fabHighlightsAfterHoursEnabled) {
     fabHighlightsAfterHoursEnabled.checked = sources.fabAcademyHighlightsAfterHours === true;
     fabHighlightsAfterHoursEnabled.disabled = sources.fabAcademyHighlights !== true;
+  }
+
+  if (localVideosPerCycle) {
+    localVideosPerCycle.value = sources.localVideosPerCycle ?? 1;
+  }
+
+  if (fabHighlightsPerCycle) {
+    fabHighlightsPerCycle.value = sources.fabAcademyHighlightsPerCycle ?? 1;
   }
 
   renderFabVideoCatalog(status.fabAcademyHighlights?.items || []);
@@ -634,7 +644,13 @@ async function saveVideoSourcesNow() {
       fabAcademyHighlights: fabHighlightsEnabled ? fabHighlightsEnabled.checked : false,
       fabAcademyHighlightsAfterHours: fabHighlightsAfterHoursEnabled
         ? fabHighlightsAfterHoursEnabled.checked
-        : false
+        : false,
+      localVideosPerCycle: localVideosPerCycle
+        ? Number(localVideosPerCycle.value) || 0
+        : 1,
+      fabAcademyHighlightsPerCycle: fabHighlightsPerCycle
+        ? Number(fabHighlightsPerCycle.value) || 0
+        : 1
     });
     videoSourcesStatus.textContent = "Saved automatically.";
   } catch (error) {
@@ -751,6 +767,9 @@ addWorkshop.addEventListener("click", async () => {
 localVideosEnabled?.addEventListener("change", scheduleVideoSourcesSave);
 fabHighlightsEnabled?.addEventListener("change", scheduleVideoSourcesSave);
 fabHighlightsAfterHoursEnabled?.addEventListener("change", scheduleVideoSourcesSave);
+
+localVideosPerCycle?.addEventListener("change", scheduleVideoSourcesSave);
+fabHighlightsPerCycle?.addEventListener("change", scheduleVideoSourcesSave);
 
 fabVideoSearch?.addEventListener("input", () => renderFabVideoCatalog());
 
