@@ -244,7 +244,7 @@ export async function getVideoLibrary() {
       ? await getFabAcademyHighlightsCatalog()
       : [];
 
-  const videos = [...localVideos, ...highlightVideos];
+
   const videos = buildBalancedPlaylist(localVideos, highlightVideos);
   const signature = getVideoSignature(videos);
 
