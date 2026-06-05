@@ -38,6 +38,7 @@ const newsHistory = document.querySelector("#newsHistory");
 
 const highlightPlaybackStatus = document.querySelector("#highlightPlaybackStatus");
 const playlistMixStatus = document.querySelector("#playlistMixStatus");
+const playlistInventoryStatus = document.querySelector("#playlistInventoryStatus");
 
 const languageSelect = document.querySelector("#languageSelect");
 const saveLanguage = document.querySelector("#saveLanguage");
@@ -312,6 +313,29 @@ function renderPlaylistMixStatus(status) {
   `;
 }
 
+function renderPlaylistInventoryStatus(status) {
+  if (!playlistInventoryStatus) return;
+
+  const videos = status.videos || [];
+
+  const localCount = videos.filter(
+    (video) => video.source === "local"
+  ).length;
+
+  const highlightCount = videos.filter(
+    (video) => video.source === "fabacademy-highlights"
+  ).length;
+
+  playlistInventoryStatus.innerHTML = `
+    <strong>Active Playlist</strong>
+    <small>
+      Local videos: ${localCount}<br>
+      Highlights: ${highlightCount}<br>
+      Total items: ${videos.length}
+    </small>
+  `;
+}
+
 function renderFabVideoCatalog(items = latestStatus?.fabAcademyHighlights?.items || []) {
   if (!fabVideoCatalog || !fabPlaylistSummary) return;
 
@@ -516,6 +540,7 @@ function render(status) {
   renderVideoSources(status);
   renderHighlightPlaybackStatus(status);
   renderPlaylistMixStatus(status);
+  renderPlaylistInventoryStatus(status);
 
   staffList.innerHTML = "";
   for (const person of status.staff) {
