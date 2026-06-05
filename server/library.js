@@ -5,6 +5,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { config } from "./config.js";
+import { isLabOpenNow, loadLocalPulseConfig } from "./localPulse.js";
 
 const videoSourcesPath = path.join(config.dataDir, "videoSources.json");
 const videoSourcesExamplePath = path.join(config.dataDir, "videoSources.example.json");
@@ -202,9 +203,19 @@ function getVideoSignature(items) {
 }
 
 export async function getVideoLibrary() {
-  const videoSources = await loadVideoSourcesConfig();
+  const [videoSources, localPulseConfig] = await Promise.all([
+    loadVideoSourcesConfig(),
+    loadLocalPulseConfig()
+  ]);
+
+  const openingHoursStatus = isLabOpenNow(localPulseConfig, config.timezone || "Atlantic/Reykjavik");
+
   const localVideos = videoSources.localVideos ? await getLocalVideoLibrary() : [];
-  const highlightVideos = videoSources.fabAcademyHighlights ? await getFabAcademyHighlightsCatalog() : [];
+  const highlightVideos =
+    videoSources.fabAcademyHighlights && openingHoursStatus.isOpen
+      ? await getFabAcademyHighlightsCatalog()
+      : [];
+
   const videos = [...localVideos, ...highlightVideos];
   const signature = getVideoSignature(videos);
 

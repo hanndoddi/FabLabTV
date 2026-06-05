@@ -86,7 +86,7 @@ export async function saveLocalPulseConfig(nextConfig) {
   return merged;
 }
 
-function getLocalDateParts(timezone) {
+export function getLocalDateParts(timezone) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone: timezone,
     year: "numeric",
@@ -100,6 +100,67 @@ function getLocalDateParts(timezone) {
   return {
     date: `${value("year")}-${value("month")}-${value("day")}`,
     weekday: value("weekday")?.toLowerCase()
+  };
+}
+
+function getLocalTimeParts(timezone) {
+  const parts = new Intl.DateTimeFormat("en-GB", {
+    timeZone: timezone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  }).formatToParts(new Date());
+
+  const value = (type) => parts.find((part) => part.type === type)?.value;
+
+  return {
+    hour: value("hour") || "00",
+    minute: value("minute") || "00",
+    minutes: Number(value("hour") || 0) * 60 + Number(value("minute") || 0)
+  };
+}
+
+function timeToMinutes(value) {
+  const [hour, minute] = String(value || "").split(":").map((part) => Number(part));
+  if (!Number.isFinite(hour) || !Number.isFinite(minute)) return null;
+  return hour * 60 + minute;
+}
+
+function isTimeWithinRange(nowMinutes, range) {
+  const openMinutes = timeToMinutes(range?.open);
+  const closeMinutes = timeToMinutes(range?.close);
+
+  if (openMinutes == null || closeMinutes == null) return false;
+
+  if (openMinutes === closeMinutes) return true;
+
+  if (openMinutes < closeMinutes) {
+    return nowMinutes >= openMinutes && nowMinutes < closeMinutes;
+  }
+
+  return nowMinutes >= openMinutes || nowMinutes < closeMinutes;
+}
+
+export function isLabOpenNow(localPulseConfig, timezone = "Atlantic/Reykjavik") {
+  const openingHours = localPulseConfig?.openingHours;
+
+  if (!openingHours?.enabled) {
+    return { enabled: false, isOpen: true, reason: "opening-hours-disabled" };
+  }
+
+  const { date, weekday } = getLocalDateParts(timezone);
+  const { ranges, note } = getOpeningHoursForDate(openingHours, date, weekday);
+  const time = getLocalTimeParts(timezone);
+  const isOpen = ranges.some((range) => isTimeWithinRange(time.minutes, range));
+
+  return {
+    enabled: true,
+    isOpen,
+    date,
+    weekday,
+    time: `${time.hour}:${time.minute}`,
+    ranges,
+    note: note || null
   };
 }
 
