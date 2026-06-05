@@ -12,8 +12,6 @@ const brandingLogoPreview = document.querySelector("#brandingLogoPreview");
 const previousVideo = document.querySelector("#previousVideo");
 const nextVideo = document.querySelector("#nextVideo");
 const pauseVideo = document.querySelector("#pauseVideo");
-const audioToggle = document.querySelector("#audioToggle");
-const audioSetupNotice = document.querySelector("#audioSetupNotice");
 const videoCount = document.querySelector("#videoCount");
 const remoteNowPlaying = document.querySelector("#remoteNowPlaying");
 const videoUpload = document.querySelector("#videoUpload");
@@ -171,29 +169,6 @@ function renderRemoteNowPlaying(status) {
     ${item.detail ? `<span>${escapeHtml(item.detail)}</span>` : ""}
     <span class="now-playing-meta">${escapeHtml(sourceLabel)}</span>
   `;
-}
-
-function renderAudioControls(status) {
-  if (!audioToggle || !audioSetupNotice) return;
-
-  const audio = status.audio || { requested: false, enabled: false, muted: true };
-
-  if (!audio.enabled || audio.muted) {
-    audioToggle.textContent = audio.enabled ? "Enable TV audio" : "Set up TV audio";
-  } else {
-    audioToggle.textContent = "Disable TV audio";
-  }
-
-  if (audio.requested && !audio.enabled) {
-    audioSetupNotice.textContent = "Audio setup requested. Go to the TV screen and click Enable Audio once.";
-    audioSetupNotice.classList.remove("is-hidden");
-  } else if (audio.enabled && !audio.muted) {
-    audioSetupNotice.textContent = "TV audio is enabled. Use Disable TV audio here or the TV volume controls.";
-    audioSetupNotice.classList.remove("is-hidden");
-  } else {
-    audioSetupNotice.textContent = "";
-    audioSetupNotice.classList.add("is-hidden");
-  }
 }
 
 function extensionFromFilename(filename) {
@@ -449,7 +424,6 @@ function render(status) {
   latestStatus = status;
   videoCount.textContent = `${status.videos.length} video(s) in the active playlist`;
   renderRemoteNowPlaying(status);
-  renderAudioControls(status);
   renderVideoSources(status);
 
   staffList.innerHTML = "";
@@ -581,17 +555,6 @@ nextVideo?.addEventListener("click", async () => {
 pauseVideo?.addEventListener("click", async () => {
   await postJson("/api/video/pause-toggle");
 });
-
-audioToggle?.addEventListener("click", async () => {
-  const audio = latestStatus?.audio || { enabled: false, muted: true };
-
-  if (audio.enabled && !audio.muted) {
-    await postJson("/api/audio/disable");
-  } else {
-    await postJson("/api/audio/enable");
-  }
-});
-
 
 let videoSourcesSaveTimer = null;
 

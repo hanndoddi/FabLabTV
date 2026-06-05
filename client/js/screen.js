@@ -32,12 +32,12 @@ let newsIndex = 0;
 let globalPulseIndex = 0;
 let localPulseIndex = 0;
 
-// Start muted so autoplay is reliable. Audio can be enabled later with a
-// one-time click on the TV screen, but only after Remote requests it.
-video.muted = true;
-video.defaultMuted = true;
+// The TV screen starts after one local click. That click unlocks browser audio.
+let tvStarted = localStorage.getItem("fablabtv.tvStarted") === "true";
+video.muted = !tvStarted;
+video.defaultMuted = !tvStarted;
 video.volume = 1;
-let tvAudioApproved = localStorage.getItem("fablabtv.audioApproved") === "true";
+audioEnableOverlay?.classList.toggle("is-hidden", tvStarted);
 
 const manualDateNames = {
   "is-IS": {
@@ -64,8 +64,6 @@ function formatLocalizedDate(now, options) {
     try {
       const formatted = now.toLocaleDateString(candidate, options);
 
-      // Some browser/OS combinations silently fall back to English for Icelandic.
-      // If that happens, use the manual Icelandic names below.
       if ((language === "is-IS" || locale === "is-IS" || candidate === "is") && /wednesday|june/i.test(formatted)) {
         break;
       }
@@ -90,7 +88,6 @@ function formatLocalizedDate(now, options) {
 
   return now.toLocaleDateString("en-US", options);
 }
-
 
 function getI18n(status = statusCache) {
   const i18n = status?.i18n || {};
@@ -126,7 +123,6 @@ function updateStaticLabels() {
   if (localPulseLabel) localPulseLabel.textContent = t("localPulse", "Local Pulse");
 }
 
-
 function renderNowPlayingItem(item) {
   if (!item) {
     nowPlaying.textContent = t("addVideosOrStreaming", "Add videos to videos/ or turn on streaming highlights in Remote.");
@@ -144,45 +140,21 @@ function renderNowPlayingItem(item) {
   }
 }
 
-function getDesiredAudioState(status = statusCache) {
-  const audio = status?.audio || {};
-  return {
-    requested: Boolean(audio.requested),
-    enabled: Boolean(audio.enabled),
-    muted: audio.muted !== false
-  };
-}
-
-function updateAudioOverlay(status = statusCache) {
-  if (!audioEnableOverlay) return;
-
-  const audio = getDesiredAudioState(status);
-  const shouldShow = audio.requested && !tvAudioApproved;
-  audioEnableOverlay.classList.toggle("is-hidden", !shouldShow);
-}
-
-function applyAudioState(status = statusCache) {
-  const audio = getDesiredAudioState(status);
-  const shouldPlayWithAudio = tvAudioApproved && audio.enabled && !audio.muted;
-
-  video.volume = 1;
-  video.muted = !shouldPlayWithAudio;
-  video.defaultMuted = !shouldPlayWithAudio;
-  updateAudioOverlay(status);
-}
-
 function startPlayback() {
-  applyAudioState();
+  video.volume = 1;
+  video.muted = !tvStarted;
+  video.defaultMuted = !tvStarted;
+
+  if (!tvStarted) {
+    audioEnableOverlay?.classList.remove("is-hidden");
+    return;
+  }
 
   const playPromise = video.play();
 
   if (playPromise?.catch) {
     playPromise.catch(() => {
-      // If the browser refuses autoplay with audio, fall back to muted playback
-      // and let Remote request the one-time TV audio setup again.
-      video.muted = true;
-      video.defaultMuted = true;
-      video.play().catch(() => {});
+      audioEnableOverlay?.classList.remove("is-hidden");
     });
   }
 }
@@ -503,7 +475,6 @@ function renderStatus(status) {
   renderNews(status);
   renderGlobalPulse(status);
   renderLocalPulse(status);
-  applyAudioState(status);
 
   if (status.nowPlayingOverride?.url) {
     if (currentVideoUrl !== status.nowPlayingOverride.url) {
@@ -514,9 +485,6 @@ function renderStatus(status) {
     return;
   }
 
-  // Remote/status updates should not restart or pause the TV video.
-  // The TV only starts playback here when it has no active video yet.
-  // Explicit video changes still happen through socket commands and the ended handler.
   if (!currentVideoUrl || !video.src) {
     playVideo(status.currentVideoIndex || 0, { force: true });
   } else {
@@ -559,25 +527,14 @@ socket.on("command", (command) => {
     }
   }
 
-  if (command.type === "audioRequestEnable") {
-    updateAudioOverlay({ ...(statusCache || {}), audio: { requested: true, enabled: false, muted: true } });
-  }
-
-  if (command.type === "audioSetMuted") {
-    if (statusCache) {
-      statusCache.audio = { ...(statusCache.audio || {}), muted: Boolean(command.muted) };
-    }
-    applyAudioState();
-  }
-
   if (command.type === "reloadLogo" && stationLogoImage) {
     stationLogoImage.src = `/branding/current-logo.png?v=${encodeURIComponent(command.version || Date.now())}`;
   }
 });
 
 enableAudioOnTv?.addEventListener("click", async () => {
-  tvAudioApproved = true;
-  localStorage.setItem("fablabtv.audioApproved", "true");
+  tvStarted = true;
+  localStorage.setItem("fablabtv.tvStarted", "true");
 
   video.muted = false;
   video.defaultMuted = false;
@@ -586,13 +543,12 @@ enableAudioOnTv?.addEventListener("click", async () => {
   try {
     await video.play();
     audioEnableOverlay?.classList.add("is-hidden");
-    await fetch("/api/audio/approved", { method: "POST" });
   } catch {
-    tvAudioApproved = false;
-    localStorage.removeItem("fablabtv.audioApproved");
+    tvStarted = false;
+    localStorage.removeItem("fablabtv.tvStarted");
     video.muted = true;
     video.defaultMuted = true;
-    startPlayback();
+    audioEnableOverlay?.classList.remove("is-hidden");
   }
 });
 
