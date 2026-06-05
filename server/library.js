@@ -200,6 +200,28 @@ function shuffleItems(items) {
   return shuffled;
 }
 
+function buildBalancedPlaylist(localVideos, highlightVideos) {
+  if (!localVideos.length) return shuffleItems(highlightVideos);
+  if (!highlightVideos.length) return shuffleItems(localVideos);
+
+  const shuffledLocalVideos = shuffleItems(localVideos);
+  const shuffledHighlightVideos = shuffleItems(highlightVideos);
+  const playlist = [];
+  const maxLength = Math.max(shuffledLocalVideos.length, shuffledHighlightVideos.length);
+
+  for (let index = 0; index < maxLength; index += 1) {
+    if (shuffledLocalVideos[index]) {
+      playlist.push(shuffledLocalVideos[index]);
+    }
+
+    if (shuffledHighlightVideos[index]) {
+      playlist.push(shuffledHighlightVideos[index]);
+    }
+  }
+
+  return playlist;
+}
+
 function getVideoSignature(items) {
   return items.map((item) => item.id).join("|");
 }
@@ -223,12 +245,13 @@ export async function getVideoLibrary() {
       : [];
 
   const videos = [...localVideos, ...highlightVideos];
+  const videos = buildBalancedPlaylist(localVideos, highlightVideos);
   const signature = getVideoSignature(videos);
 
   if (signature !== shuffledVideoCache.signature) {
     shuffledVideoCache = {
       signature,
-      items: shuffleItems(videos)
+      items: videos
     };
   }
 
