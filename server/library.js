@@ -16,7 +16,8 @@ const staffProfilesExamplePath = path.join(config.dataDir, "staffProfiles.exampl
 
 const defaultVideoSources = {
   localVideos: true,
-  fabAcademyHighlights: false
+  fabAcademyHighlights: false,
+  fabAcademyHighlightsAfterHours: false
 };
 
 function stripExtension(filename) {
@@ -100,7 +101,8 @@ export async function deleteStaffProfile(filename) {
 function normalizeVideoSourcesConfig(value = {}) {
   return {
     localVideos: value.localVideos !== false,
-    fabAcademyHighlights: value.fabAcademyHighlights === true
+    fabAcademyHighlights: value.fabAcademyHighlights === true,
+    fabAcademyHighlightsAfterHours: value.fabAcademyHighlightsAfterHours === true
   };
 }
 
@@ -211,8 +213,12 @@ export async function getVideoLibrary() {
   const openingHoursStatus = isLabOpenNow(localPulseConfig, config.timezone || "Atlantic/Reykjavik");
 
   const localVideos = videoSources.localVideos ? await getLocalVideoLibrary() : [];
+  const highlightsAllowed =
+    openingHoursStatus.isOpen ||
+    videoSources.fabAcademyHighlightsAfterHours;
+
   const highlightVideos =
-    videoSources.fabAcademyHighlights && openingHoursStatus.isOpen
+    videoSources.fabAcademyHighlights && highlightsAllowed
       ? await getFabAcademyHighlightsCatalog()
       : [];
 

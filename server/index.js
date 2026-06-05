@@ -284,7 +284,8 @@ app.get("/api/fabacademy-highlights", async (_req, res) => {
 app.put("/api/video-sources", async (req, res) => {
   await saveVideoSourcesConfig({
     localVideos: req.body.localVideos !== false,
-    fabAcademyHighlights: req.body.fabAcademyHighlights === true
+    fabAcademyHighlights: req.body.fabAcademyHighlights === true,
+    fabAcademyHighlightsAfterHours: req.body.fabAcademyHighlightsAfterHours === true
   });
 
   await broadcastStatus();

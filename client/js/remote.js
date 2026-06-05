@@ -19,6 +19,7 @@ const uploadVideo = document.querySelector("#uploadVideo");
 const videoUploadStatus = document.querySelector("#videoUploadStatus");
 const localVideosEnabled = document.querySelector("#localVideosEnabled");
 const fabHighlightsEnabled = document.querySelector("#fabHighlightsEnabled");
+const fabHighlightsAfterHoursEnabled = document.querySelector("#fabHighlightsAfterHoursEnabled");
 const fabVideoSearch = document.querySelector("#fabVideoSearch");
 const fabVideoCatalog = document.querySelector("#fabVideoCatalog");
 const fabPlaylistSummary = document.querySelector("#fabPlaylistSummary");
@@ -233,6 +234,11 @@ function renderVideoSources(status) {
 
   if (fabHighlightsEnabled) {
     fabHighlightsEnabled.checked = sources.fabAcademyHighlights === true;
+  }
+
+  if (fabHighlightsAfterHoursEnabled) {
+    fabHighlightsAfterHoursEnabled.checked = sources.fabAcademyHighlightsAfterHours === true;
+    fabHighlightsAfterHoursEnabled.disabled = sources.fabAcademyHighlights !== true;
   }
 
   renderFabVideoCatalog(status.fabAcademyHighlights?.items || []);
@@ -566,7 +572,10 @@ async function saveVideoSourcesNow() {
   try {
     await putJson("/api/video-sources", {
       localVideos: localVideosEnabled ? localVideosEnabled.checked : true,
-      fabAcademyHighlights: fabHighlightsEnabled ? fabHighlightsEnabled.checked : false
+      fabAcademyHighlights: fabHighlightsEnabled ? fabHighlightsEnabled.checked : false,
+      fabAcademyHighlightsAfterHours: fabHighlightsAfterHoursEnabled
+        ? fabHighlightsAfterHoursEnabled.checked
+        : false
     });
     videoSourcesStatus.textContent = "Saved automatically.";
   } catch (error) {
@@ -682,6 +691,7 @@ addWorkshop.addEventListener("click", async () => {
 
 localVideosEnabled?.addEventListener("change", scheduleVideoSourcesSave);
 fabHighlightsEnabled?.addEventListener("change", scheduleVideoSourcesSave);
+fabHighlightsAfterHoursEnabled?.addEventListener("change", scheduleVideoSourcesSave);
 
 fabVideoSearch?.addEventListener("input", () => renderFabVideoCatalog());
 
