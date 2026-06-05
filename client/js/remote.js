@@ -36,6 +36,9 @@ const showAddStaff = document.querySelector("#showAddStaff");
 const addStaffPanel = document.querySelector("#addStaffPanel");
 const newsHistory = document.querySelector("#newsHistory");
 
+const highlightPlaybackStatus = document.querySelector("#highlightPlaybackStatus");
+const playlistMixStatus = document.querySelector("#playlistMixStatus");
+
 const languageSelect = document.querySelector("#languageSelect");
 const saveLanguage = document.querySelector("#saveLanguage");
 const labelEditor = document.querySelector("#labelEditor");
@@ -296,6 +299,19 @@ function renderHighlightPlaybackStatus(status) {
   `;
 }
 
+function renderPlaylistMixStatus(status) {
+  if (!playlistMixStatus) return;
+
+  const sources = status.videoSources || {};
+  const localPerCycle = sources.localVideosPerCycle ?? 1;
+  const highlightsPerCycle = sources.fabAcademyHighlightsPerCycle ?? 1;
+
+  playlistMixStatus.innerHTML = `
+    <strong>Playlist Mix</strong>
+    <small>${escapeHtml(localPerCycle)} local video${Number(localPerCycle) === 1 ? "" : "s"} → ${escapeHtml(highlightsPerCycle)} highlight${Number(highlightsPerCycle) === 1 ? "" : "s"}</small>
+  `;
+}
+
 function renderFabVideoCatalog(items = latestStatus?.fabAcademyHighlights?.items || []) {
   if (!fabVideoCatalog || !fabPlaylistSummary) return;
 
@@ -499,6 +515,7 @@ function render(status) {
   renderRemoteNowPlaying(status);
   renderVideoSources(status);
   renderHighlightPlaybackStatus(status);
+  renderPlaylistMixStatus(status);
 
   staffList.innerHTML = "";
   for (const person of status.staff) {
