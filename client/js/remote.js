@@ -47,6 +47,9 @@ const saveWeather = document.querySelector("#saveWeather");
 const openingHoursEditor = document.querySelector("#openingHoursEditor");
 const saveOpeningHours = document.querySelector("#saveOpeningHours");
 
+const openingHoursStatusState = document.querySelector("#openingHoursStatusState");
+const openingHoursStatusTime = document.querySelector("#openingHoursStatusTime");
+
 const messageList = document.querySelector("#messageList");
 const messageTitle = document.querySelector("#messageTitle");
 const messageBody = document.querySelector("#messageBody");
@@ -366,6 +369,21 @@ function renderWeather(localConfig) {
   weatherLongitude.value = weather.longitude ?? "";
 }
 
+function renderOpeningHoursStatus(status) {
+  if (!openingHoursStatusState || !openingHoursStatusTime) return;
+
+  const info = status.openingHoursStatus;
+
+  if (!info) {
+    openingHoursStatusState.textContent = "Unknown";
+    openingHoursStatusTime.textContent = "";
+    return;
+  }
+
+  openingHoursStatusState.textContent = info.isOpen ? "🟢 OPEN" : "🔴 CLOSED";
+  openingHoursStatusTime.textContent = `Current time: ${info.time || "--:--"}`;
+}
+
 function renderOpeningHours(localConfig) {
   const weekly = localConfig.openingHours?.weekly || {};
   openingHoursEditor.innerHTML = "";
@@ -504,6 +522,7 @@ function render(status) {
 
   renderLanguageControls(status);
   renderLocalPulseControls(status);
+  renderOpeningHoursStatus(status);
   renderNewsHistory(status.news || []);
 
   if (!status.staff.length) {
