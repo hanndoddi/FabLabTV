@@ -1,12 +1,14 @@
 // Lightweight localization support.
 // Dates/months use browser/Intl locales; app-owned labels use editable keys
-// stored in data/i18n.json so each lab can adjust wording naturally.
+// stored in data/i18n.json so the project can ship translations.
+// The selected language is local runtime state stored in data/userSettings.json.
 
 import path from "node:path";
 import { config } from "./config.js";
 import { readJsonFile, writeJsonFile } from "./utils/filesystem.js";
 
 const i18nFile = path.join(config.dataDir, "i18n.json");
+const userSettingsFile = path.join(config.dataDir, "userSettings.json");
 
 export const supportedLanguages = [
   { code: "en-US", name: "English", locale: "en-US" },
@@ -196,8 +198,11 @@ for (const [language, labels] of Object.entries(generatedLanguageLabels)) {
 }
 
 export const defaultI18nConfig = {
-  language: "en-US",
   labels: defaultLabels
+};
+
+export const defaultUserSettings = {
+  language: "en-US"
 };
 
 function isSupportedLanguage(code) {
@@ -208,7 +213,7 @@ export function normalizeLanguage(code) {
   return isSupportedLanguage(code) ? code : "en-US";
 }
 
-function mergeI18nConfig(userConfig = {}) {
+function mergeI18nConfig(userConfig = {}, userSettings = {}) {
   const userLabels = userConfig.labels || {};
   const labels = {};
 
@@ -220,7 +225,7 @@ function mergeI18nConfig(userConfig = {}) {
     };
   }
 
-  const language = normalizeLanguage(userConfig.language);
+  const language = normalizeLanguage(userSettings.language || userConfig.language);
   const locale = supportedLanguages.find((item) => item.code === language)?.locale || "en-US";
 
   return {
@@ -231,17 +236,46 @@ function mergeI18nConfig(userConfig = {}) {
   };
 }
 
-export async function loadI18nConfig() {
-  const userConfig = await readJsonFile(i18nFile, {});
-  return mergeI18nConfig(userConfig);
+async function loadUserSettings() {
+  return readJsonFile(userSettingsFile, defaultUserSettings);
 }
 
-export async function saveI18nConfig(nextConfig) {
-  const merged = mergeI18nConfig(nextConfig);
-  await writeJsonFile(i18nFile, {
-    language: merged.language,
-    labels: merged.labels
-  });
+async function saveUserSettings(nextSettings = {}) {
+  const language = normalizeLanguage(nextSettings.language);
+  const settings = { ...defaultUserSettings, ...nextSettings, language };
+  await writeJsonFile(userSettingsFile, settings);
+  return settings;
+}
+
+export async function loadI18nConfig() {
+  const userConfig = await readJsonFile(i18nFile, {});
+  const userSettings = await loadUserSettings();
+  return mergeI18nConfig(userConfig, userSettings);
+}
+
+export async function saveI18nConfig(nextConfig = {}) {
+  const userConfig = await readJsonFile(i18nFile, {});
+
+  const userSettings = nextConfig.language
+    ? await saveUserSettings({ language: nextConfig.language })
+    : await loadUserSettings();
+
+  const shouldSaveLabels = Object.hasOwn(nextConfig, "labels");
+
+  const merged = mergeI18nConfig(
+    {
+      ...userConfig,
+      labels: shouldSaveLabels ? nextConfig.labels : userConfig.labels
+    },
+    userSettings
+  );
+
+  if (shouldSaveLabels) {
+    await writeJsonFile(i18nFile, {
+      labels: merged.labels
+    });
+  }
+
   return merged;
 }
 

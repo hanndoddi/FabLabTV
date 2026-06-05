@@ -308,9 +308,7 @@ app.get("/api/i18n", async (_req, res) => {
 });
 
 app.put("/api/i18n/language", async (req, res) => {
-  const current = await loadI18nConfig();
   await saveI18nConfig({
-    ...current,
     language: normalizeLanguage(req.body.language)
   });
 
