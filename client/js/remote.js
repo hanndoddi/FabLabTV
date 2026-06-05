@@ -247,6 +247,45 @@ function renderVideoSources(status) {
   renderFabVideoCatalog(status.fabAcademyHighlights?.items || []);
 }
 
+function renderHighlightPlaybackStatus(status) {
+  if (!highlightPlaybackStatus) return;
+
+  const sources = status.videoSources || {};
+  const openingHours = status.openingHoursStatus || {};
+  const highlightsEnabled = sources.fabAcademyHighlights === true;
+  const afterHoursOverride = sources.fabAcademyHighlightsAfterHours === true;
+  const labIsOpen = openingHours.isOpen === true;
+
+  if (!highlightsEnabled) {
+    highlightPlaybackStatus.innerHTML = `
+      <strong>Highlights Off</strong>
+      <small>Streaming highlights are disabled in the normal TV playlist.</small>
+    `;
+    return;
+  }
+
+  if (labIsOpen) {
+    highlightPlaybackStatus.innerHTML = `
+      <strong>Highlights Active</strong>
+      <small>The lab is open, so Fab Academy Highlights may appear in the normal playlist.</small>
+    `;
+    return;
+  }
+
+  if (afterHoursOverride) {
+    highlightPlaybackStatus.innerHTML = `
+      <strong>Highlights Active After Hours</strong>
+      <small>The lab is closed, but after-hours highlight streaming is enabled.</small>
+    `;
+    return;
+  }
+
+  highlightPlaybackStatus.innerHTML = `
+    <strong>Highlights Paused</strong>
+    <small>The lab is closed and after-hours highlight streaming is off.</small>
+  `;
+}
+
 function renderFabVideoCatalog(items = latestStatus?.fabAcademyHighlights?.items || []) {
   if (!fabVideoCatalog || !fabPlaylistSummary) return;
 
@@ -449,6 +488,7 @@ function render(status) {
   videoCount.textContent = `${status.videos.length} video(s) in the active playlist`;
   renderRemoteNowPlaying(status);
   renderVideoSources(status);
+  renderHighlightPlaybackStatus(status);
 
   staffList.innerHTML = "";
   for (const person of status.staff) {
