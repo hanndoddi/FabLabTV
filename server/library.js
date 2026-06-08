@@ -17,9 +17,11 @@ const staffProfilesExamplePath = path.join(config.dataDir, "staffProfiles.exampl
 const defaultVideoSources = {
   localVideos: true,
   fabAcademyHighlights: false,
+  slides: true,
   fabAcademyHighlightsAfterHours: false,
   localVideosPerCycle: 1,
-  fabAcademyHighlightsPerCycle: 1
+  fabAcademyHighlightsPerCycle: 1,
+  slidesPerCycle: 1
 };
 
 function stripExtension(filename) {
@@ -109,9 +111,11 @@ function normalizeVideoSourcesConfig(value = {}) {
   return {
     localVideos: value.localVideos !== false,
     fabAcademyHighlights: value.fabAcademyHighlights === true,
+    slides: value.slides !== false,
     fabAcademyHighlightsAfterHours: value.fabAcademyHighlightsAfterHours === true,
     localVideosPerCycle: normalizeCycleCount(value.localVideosPerCycle),
-    fabAcademyHighlightsPerCycle: normalizeCycleCount(value.fabAcademyHighlightsPerCycle)
+    fabAcademyHighlightsPerCycle: normalizeCycleCount(value.fabAcademyHighlightsPerCycle),
+    slidesPerCycle: normalizeCycleCount(value.slidesPerCycle)
   };
 }
 
@@ -227,7 +231,7 @@ function shuffleItems(items) {
   return shuffled;
 }
 
-function buildBalancedPlaylist(localVideos, highlightVideos, options = {}) {
+function buildBalancedPlaylist(localVideos, highlightVideos, slides = [], options = {}) {
   if (!localVideos.length) return shuffleItems(highlightVideos);
   if (!highlightVideos.length) return shuffleItems(localVideos);
 
@@ -283,6 +287,7 @@ export async function getVideoLibrary() {
   const openingHoursStatus = isLabOpenNow(localPulseConfig, config.timezone || "Atlantic/Reykjavik");
 
   const localVideos = videoSources.localVideos ? await getLocalVideoLibrary() : [];
+  const slides = videoSources.slides ? await getLocalSlideLibrary() : [];
   const highlightsAllowed =
     openingHoursStatus.isOpen ||
     videoSources.fabAcademyHighlightsAfterHours;
@@ -293,7 +298,7 @@ export async function getVideoLibrary() {
       : [];
 
 
-  const videos = buildBalancedPlaylist(localVideos, highlightVideos, videoSources);
+  const videos = buildBalancedPlaylist(localVideos, highlightVideos, slides, videoSources);
   const signature = getVideoSignature(videos);
 
   if (signature !== shuffledVideoCache.signature) {

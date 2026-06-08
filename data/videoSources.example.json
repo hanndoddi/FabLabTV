@@ -1,7 +1,9 @@
 {
   "localVideos": true,
   "fabAcademyHighlights": false,
+  "slides": true,
   "fabAcademyHighlightsAfterHours": false,
   "localVideosPerCycle": 1,
-  "fabAcademyHighlightsPerCycle": 1
+  "fabAcademyHighlightsPerCycle": 1,
+  "slidesPerCycle": 1
 }

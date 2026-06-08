@@ -267,6 +267,15 @@ function renderVideoSources(status) {
     fabHighlightsAfterHoursEnabled.disabled = sources.fabAcademyHighlights !== true;
   }
 
+  if (slidesEnabled) {
+    slidesEnabled.checked = sources.slides !== false;
+  }
+
+  if (slidesPerCycle) {
+    slidesPerCycle.value = sources.slidesPerCycle ?? 1;
+    slidesPerCycle.disabled = sources.slides === false;
+  }
+
   if (localVideosPerCycle) {
     localVideosPerCycle.value = sources.localVideosPerCycle ?? 1;
   }
@@ -837,6 +846,10 @@ async function saveVideoSourcesNow() {
         : 1,
       fabAcademyHighlightsPerCycle: fabHighlightsPerCycle
         ? Number(fabHighlightsPerCycle.value) || 0
+        : 1,
+      slides: slidesEnabled ? slidesEnabled.checked : true,
+      slidesPerCycle: slidesPerCycle
+        ? Number(slidesPerCycle.value) || 0
         : 1
     });
     videoSourcesStatus.textContent = "Saved automatically.";
@@ -954,9 +967,11 @@ addWorkshop.addEventListener("click", async () => {
 localVideosEnabled?.addEventListener("change", scheduleVideoSourcesSave);
 fabHighlightsEnabled?.addEventListener("change", scheduleVideoSourcesSave);
 fabHighlightsAfterHoursEnabled?.addEventListener("change", scheduleVideoSourcesSave);
+slidesEnabled?.addEventListener("change", scheduleVideoSourcesSave);
 
 localVideosPerCycle?.addEventListener("change", scheduleVideoSourcesSave);
 fabHighlightsPerCycle?.addEventListener("change", scheduleVideoSourcesSave);
+slidesPerCycle?.addEventListener("change", scheduleVideoSourcesSave);
 
 fabVideoSearch?.addEventListener("input", () => renderFabVideoCatalog());
 

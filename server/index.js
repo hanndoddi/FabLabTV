@@ -313,9 +313,11 @@ app.put("/api/video-sources", async (req, res) => {
   await saveVideoSourcesConfig({
     localVideos: req.body.localVideos !== false,
     fabAcademyHighlights: req.body.fabAcademyHighlights === true,
+    slides: req.body.slides !== false,
     fabAcademyHighlightsAfterHours: req.body.fabAcademyHighlightsAfterHours === true,
     localVideosPerCycle: req.body.localVideosPerCycle,
-    fabAcademyHighlightsPerCycle: req.body.fabAcademyHighlightsPerCycle
+    fabAcademyHighlightsPerCycle: req.body.fabAcademyHighlightsPerCycle,
+    slidesPerCycle: req.body.slidesPerCycle
   });
 
   await broadcastStatus();
