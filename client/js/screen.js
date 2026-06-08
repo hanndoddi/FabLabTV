@@ -37,6 +37,9 @@ let newsIndex = 0;
 let globalPulseIndex = 0;
 let localPulseIndex = 0;
 
+let currentSlideIndex = 0;
+let slideTimer = null;
+
 // The TV screen starts after one local click. That click unlocks browser audio.
 let tvStarted = localStorage.getItem("fablabtv.tvStarted") === "true";
 video.muted = !tvStarted;
@@ -198,6 +201,7 @@ function startPlayback() {
 }
 
 function showVideoDisplay() {
+  stopSlideRotation();
   slide.classList.add("is-hidden");
   video.classList.remove("is-hidden");
 }
@@ -217,6 +221,30 @@ function showSlideDisplay(slideItem) {
     source: "slide",
     subtitle: "Slide"
   });
+}
+
+function stopSlideRotation() {
+  if (slideTimer) {
+    clearInterval(slideTimer);
+    slideTimer = null;
+  }
+}
+
+function startSlideRotation() {
+  stopSlideRotation();
+
+  const slides = statusCache?.slides || [];
+
+  if (!slides.length || statusCache?.videos?.length) {
+    return;
+  }
+
+  showSlideDisplay(slides[currentSlideIndex % slides.length]);
+
+  slideTimer = setInterval(() => {
+    currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+    showSlideDisplay(slides[currentSlideIndex]);
+  }, 10000);
 }
 
 function playVideoItem(item, { oneTime = false } = {}) {
@@ -255,7 +283,7 @@ function playVideo(index, { force = false, notify = false } = {}) {
 
     if (firstSlide) {
       videoEmpty.style.display = "none";
-      showSlideDisplay(firstSlide);
+      startSlideRotation();
     } else {
       showVideoDisplay();
       videoEmpty.style.display = "grid";
