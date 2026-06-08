@@ -39,6 +39,15 @@ video.defaultMuted = !tvStarted;
 video.volume = 1;
 audioEnableOverlay?.classList.toggle("is-hidden", tvStarted);
 
+function setBlockVisibility(element, visible = true) {
+  element?.classList.toggle("is-hidden", !visible);
+}
+
+function applyLayoutSettings(status) {
+  const layout = status?.i18n?.layout || {};
+  setBlockVisibility(clock, layout.showClock !== true);
+}
+
 const manualDateNames = {
   "is-IS": {
     weekdays: ["sunnudagur", "mánudagur", "þriðjudagur", "miðvikudagur", "fimmtudagur", "föstudagur", "laugardagur"],
@@ -488,6 +497,7 @@ function renderLocalPulse(status) {
 function renderStatus(status) {
   statusCache = status;
   updateStaticLabels();
+  applyLayoutSettings(status);
 
   renderStaff(status);
   renderNews(status);

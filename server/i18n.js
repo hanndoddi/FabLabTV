@@ -202,7 +202,10 @@ export const defaultI18nConfig = {
 };
 
 export const defaultUserSettings = {
-  language: "en-US"
+  language: "en-US",
+  layout: {
+    showClock: true
+  }
 };
 
 function isSupportedLanguage(code) {
@@ -232,7 +235,11 @@ function mergeI18nConfig(userConfig = {}, userSettings = {}) {
     language,
     locale,
     supportedLanguages,
-    labels
+    labels,
+    layout: {
+      ...defaultUserSettings.layout,
+      ...(userSettings.layout || {})
+    }
   };
 }
 

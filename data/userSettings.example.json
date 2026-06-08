@@ -1,3 +1,6 @@
 {
-  "language": "en-US"
+  "language": "en-US",
+  "layout": {
+    "showClock": false
+  }
 }

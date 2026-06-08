@@ -63,6 +63,9 @@ video {
   background: #070707;
 }
 
+.is-hidden {
+  display: none !important;
+}
 
 .side-panel {
   display: grid;
