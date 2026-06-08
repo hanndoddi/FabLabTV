@@ -18,9 +18,11 @@
   "author": "Andri Sæmundsson, Fab Lab Reykjavík",
   "license": "MIT",
   "dependencies": {
+    "@napi-rs/canvas": "^1.0.0",
     "chokidar": "^3.6.0",
     "cors": "^2.8.5",
     "express": "^4.19.2",
+    "pdfjs-dist": "^6.0.227",
     "socket.io": "^4.7.5"
   },
   "devDependencies": {
