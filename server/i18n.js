@@ -207,7 +207,8 @@ export const defaultUserSettings = {
     showClock: true,
     showTechNews: true,
     showStaff: true,
-    showGlobalPulse: true
+    showGlobalPulse: true,
+    showLocalPulse: true
   }
 };
 

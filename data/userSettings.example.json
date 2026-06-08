@@ -3,7 +3,8 @@
   "layout": {
     "showClock": true,
     "showTechNews": true,
-    "showStaff": false,
-    "showGlobalPulse": true
+    "showStaff": true,
+    "showGlobalPulse": true,
+    "showLocalPulse": true
   }
 }

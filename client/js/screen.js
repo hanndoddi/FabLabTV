@@ -51,6 +51,7 @@ function applyLayoutSettings(status) {
   setBlockVisibility(newsCard, layout.showTechNews !== false);
   setBlockVisibility(onCallCard, layout.showStaff !== false);
   setBlockVisibility(globalPulse, layout.showGlobalPulse !== false);
+  setBlockVisibility(localPulse, layout.showLocalPulse !== false);
 }
 
 const manualDateNames = {
