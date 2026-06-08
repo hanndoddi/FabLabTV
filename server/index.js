@@ -332,7 +332,8 @@ app.put("/api/settings/layout", async (req, res) => {
   await saveI18nConfig({
     language: current.language,
     layout: {
-      showClock: req.body.showClock !== false
+      ...(current.layout || {}),
+      ...(req.body || {})
     }
   });
 

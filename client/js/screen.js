@@ -11,6 +11,7 @@ const staffName = document.querySelector("#staffName");
 const staffStatus = document.querySelector("#staffStatus");
 const nowPlaying = document.querySelector("#nowPlaying");
 
+const newsCard = document.querySelector(".news-card");
 const newsContent = document.querySelector("#newsContent");
 const newsHeadline = document.querySelector("#newsHeadline");
 const newsBody = document.querySelector("#newsBody");
@@ -45,7 +46,8 @@ function setBlockVisibility(element, visible = true) {
 
 function applyLayoutSettings(status) {
   const layout = status?.i18n?.layout || {};
-  setBlockVisibility(clock, layout.showClock !== true);
+  setBlockVisibility(clock, layout.showClock !== false);
+  setBlockVisibility(newsCard, layout.showTechNews !== false);
 }
 
 const manualDateNames = {

@@ -1,6 +1,7 @@
 {
   "language": "en-US",
   "layout": {
-    "showClock": false
+    "showClock": true,
+    "showTechNews": true
   }
 }

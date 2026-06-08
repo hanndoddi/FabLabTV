@@ -204,7 +204,8 @@ export const defaultI18nConfig = {
 export const defaultUserSettings = {
   language: "en-US",
   layout: {
-    showClock: true
+    showClock: true,
+    showTechNews: true
   }
 };
 
