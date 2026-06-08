@@ -232,42 +232,51 @@ function shuffleItems(items) {
 }
 
 function buildBalancedPlaylist(localVideos, highlightVideos, slides = [], options = {}) {
-  if (!localVideos.length) return shuffleItems(highlightVideos);
-  if (!highlightVideos.length) return shuffleItems(localVideos);
+  const groups = [
+    {
+      count: normalizeCycleCount(options.localVideosPerCycle),
+      items: shuffleItems(localVideos)
+    },
+    {
+      count: normalizeCycleCount(options.fabAcademyHighlightsPerCycle),
+      items: shuffleItems(highlightVideos)
+    },
+    {
+      count: normalizeCycleCount(options.slidesPerCycle),
+      items: shuffleItems(slides)
+    }
+  ].filter((group) => group.count > 0 && group.items.length > 0);
 
-  const localPerCycle = normalizeCycleCount(options.localVideosPerCycle);
-  const highlightsPerCycle = normalizeCycleCount(options.fabAcademyHighlightsPerCycle);
-
-  if (!localPerCycle && !highlightsPerCycle) {
+  if (!groups.length) {
     return [];
   }
 
-  if (!localPerCycle) {
-    return shuffleItems(highlightVideos);
-  }
+  const maxItems = groups.reduce(
+    (total, group) => total + group.items.length * group.count,
+    0
+  );
 
-  if (!highlightsPerCycle) {
-    return shuffleItems(localVideos);
-  }
-
-  const shuffledLocalVideos = shuffleItems(localVideos);
-  const shuffledHighlightVideos = shuffleItems(highlightVideos);
   const playlist = [];
-  let localIndex = 0;
-  let highlightIndex = 0;
+  const indexes = new Array(groups.length).fill(0);
 
-  while (
-    localIndex < shuffledLocalVideos.length ||
-    highlightIndex < shuffledHighlightVideos.length
-  ) {
-    for (let count = 0; count < localPerCycle && localIndex < shuffledLocalVideos.length; count += 1) {
-      playlist.push(shuffledLocalVideos[localIndex]);
-      localIndex += 1;
-    }
+  while (playlist.length < maxItems) {
+    for (let groupIndex = 0; groupIndex < groups.length; groupIndex += 1) {
+      const group = groups[groupIndex];
 
-    for (let count = 0; count < highlightsPerCycle && highlightIndex < shuffledHighlightVideos.length; count += 1) {
-      playlist.push(shuffledHighlightVideos[highlightIndex]);
-      highlightIndex += 1;
+      for (let count = 0; count < group.count; count += 1) {
+        const item = group.items[indexes[groupIndex] % group.items.length];
+
+        playlist.push(item);
+        indexes[groupIndex] += 1;
+
+        if (playlist.length >= maxItems) {
+          break;
+        }
+      }
+
+      if (playlist.length >= maxItems) {
+        break;
+      }
     }
   }
 
@@ -288,6 +297,7 @@ export async function getVideoLibrary() {
 
   const localVideos = videoSources.localVideos ? await getLocalVideoLibrary() : [];
   const slides = videoSources.slides ? await getLocalSlideLibrary() : [];
+
   const highlightsAllowed =
     openingHoursStatus.isOpen ||
     videoSources.fabAcademyHighlightsAfterHours;
@@ -297,14 +307,21 @@ export async function getVideoLibrary() {
       ? await getFabAcademyHighlightsCatalog()
       : [];
 
-
-  const videos = buildBalancedPlaylist(localVideos, highlightVideos, slides, videoSources);
-  const signature = getVideoSignature(videos);
+  const signature = [
+    getVideoSignature([
+      ...localVideos,
+      ...highlightVideos,
+      ...slides
+    ]),
+    videoSources.localVideosPerCycle,
+    videoSources.fabAcademyHighlightsPerCycle,
+    videoSources.slidesPerCycle
+  ].join("|");
 
   if (signature !== shuffledVideoCache.signature) {
     shuffledVideoCache = {
       signature,
-      items: videos
+      items: buildBalancedPlaylist(localVideos, highlightVideos, slides, videoSources)
     };
   }
 

@@ -39,6 +39,7 @@ let localPulseIndex = 0;
 
 let currentSlideIndex = 0;
 let slideTimer = null;
+let playlistSlideTimer = null;
 
 // The TV screen starts after one local click. That click unlocks browser audio.
 let tvStarted = localStorage.getItem("fablabtv.tvStarted") === "true";
@@ -200,8 +201,24 @@ function startPlayback() {
   }
 }
 
+function stopPlaylistSlideTimer() {
+  if (playlistSlideTimer) {
+    clearTimeout(playlistSlideTimer);
+    playlistSlideTimer = null;
+  }
+}
+
+function scheduleNextAfterSlide() {
+  stopPlaylistSlideTimer();
+
+  playlistSlideTimer = setTimeout(() => {
+    playVideo(currentVideoIndex + 1, { notify: true });
+  }, getSlideDurationMs());
+}
+
 function showVideoDisplay() {
   stopSlideRotation();
+  stopPlaylistSlideTimer();
   slide.classList.add("is-hidden");
   video.classList.remove("is-hidden");
 }
@@ -258,11 +275,18 @@ function startSlideRotation() {
 function playVideoItem(item, { oneTime = false } = {}) {
   if (!item?.url) return;
 
-  showVideoDisplay();
-
   isOneTimeVideo = oneTime;
   currentVideoUrl = item.url;
   videoEmpty.style.display = "none";
+
+  if (item.source === "slide") {
+    showSlideDisplay(item);
+    scheduleNextAfterSlide();
+    return;
+  }
+
+  showVideoDisplay();
+
   video.src = item.url;
   video.load();
   startPlayback();
@@ -283,29 +307,20 @@ function clearOneTimeVideo() {
 
 function playVideo(index, { force = false, notify = false } = {}) {
   if (!statusCache || !statusCache.videos.length) {
-    const firstSlide = statusCache?.slides?.[0];
-
     currentVideoUrl = "";
     isOneTimeVideo = false;
     video.removeAttribute("src");
-
-    if (firstSlide) {
-      videoEmpty.style.display = "none";
-      startSlideRotation();
-    } else {
-      showVideoDisplay();
-      videoEmpty.style.display = "grid";
-      videoEmpty.textContent = getEmptyVideoMessage();
-      nowPlaying.textContent = getEmptyVideoMessage();
-    }
-
+    showVideoDisplay();
+    videoEmpty.style.display = "grid";
+    videoEmpty.textContent = getEmptyVideoMessage();
+    nowPlaying.textContent = getEmptyVideoMessage();
     return;
   }
 
   currentVideoIndex = ((index % statusCache.videos.length) + statusCache.videos.length) % statusCache.videos.length;
   const item = statusCache.videos[currentVideoIndex];
 
-  if (!force && !isOneTimeVideo && currentVideoUrl === item.url) {
+  if (!force && !isOneTimeVideo && currentVideoUrl === item.url && item.source !== "local") {
     renderNowPlayingItem(item);
     return;
   }
@@ -595,10 +610,11 @@ function renderStatus(status) {
     return;
   }
 
-  if (!currentVideoUrl || !video.src) {
+  if (!currentVideoUrl) {
     playVideo(status.currentVideoIndex || 0, { force: true });
   } else {
     const currentItem = status.videos?.find((item) => item.url === currentVideoUrl);
+
     if (currentItem) {
       renderNowPlayingItem(currentItem);
     } else {
@@ -632,6 +648,7 @@ socket.on("status", renderStatus);
 socket.on("command", (command) => {
   if (command.type === "nextVideo") {
     isOneTimeVideo = false;
+    currentVideoUrl = "";
     playVideo(command.index ?? currentVideoIndex + 1, { force: true });
   }
 
