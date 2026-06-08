@@ -160,6 +160,7 @@ function getEmptyVideoMessage() {
 }
 
 
+
 function renderNowPlayingItem(item) {
   if (!item) {
     nowPlaying.textContent = getEmptyVideoMessage();
@@ -196,8 +197,32 @@ function startPlayback() {
   }
 }
 
+function showVideoDisplay() {
+  slide.classList.add("is-hidden");
+  video.classList.remove("is-hidden");
+}
+
+function showSlideDisplay(slideItem) {
+  if (!slideItem?.url) return;
+
+  video.pause();
+  video.classList.add("is-hidden");
+
+  slide.src = slideItem.url;
+  slide.alt = slideItem.title || slideItem.filename || "";
+  slide.classList.remove("is-hidden");
+
+  renderNowPlayingItem({
+    ...slideItem,
+    source: "slide",
+    subtitle: "Slide"
+  });
+}
+
 function playVideoItem(item, { oneTime = false } = {}) {
   if (!item?.url) return;
+
+  showVideoDisplay();
 
   isOneTimeVideo = oneTime;
   currentVideoUrl = item.url;
