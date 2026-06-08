@@ -54,6 +54,9 @@ const showLocalPulseToggle = document.querySelector("#showLocalPulseToggle");
 const showNowPlayingToggle = document.querySelector("#showNowPlayingToggle");
 const showLogoToggle = document.querySelector("#showLogoToggle");
 
+const slideDurationSeconds = document.querySelector("#slideDurationSeconds");
+const slidesEnabled = document.querySelector("#slidesEnabled");
+
 const weatherLocation = document.querySelector("#weatherLocation");
 const weatherLatitude = document.querySelector("#weatherLatitude");
 const weatherLongitude = document.querySelector("#weatherLongitude");
@@ -476,6 +479,15 @@ function renderLanguageControls(status) {
   if (showLogoToggle) {
     showLogoToggle.checked = i18n.layout?.showLogo !== false;
   }
+
+  if (slidesEnabled) {
+    slidesEnabled.checked = i18n.slides?.enabled !== false;
+  }
+
+  if (slideDurationSeconds) {
+    slideDurationSeconds.value = i18n.slides?.durationSeconds ?? 10;
+    slideDurationSeconds.disabled = i18n.slides?.enabled === false;
+  }
 }
 
 function renderNewsHistory(newsItems) {
@@ -752,6 +764,18 @@ showNowPlayingToggle?.addEventListener("change", async () => {
 showLogoToggle?.addEventListener("change", async () => {
   await putJson("/api/settings/layout", {
     showLogo: showLogoToggle.checked
+  });
+});
+
+slidesEnabled?.addEventListener("change", async () => {
+  await putJson("/api/settings/slides", {
+    enabled: slidesEnabled.checked
+  });
+});
+
+slideDurationSeconds?.addEventListener("change", async () => {
+  await putJson("/api/settings/slides", {
+    durationSeconds: Number(slideDurationSeconds.value) || 10
   });
 });
 

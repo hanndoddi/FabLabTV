@@ -213,6 +213,7 @@ export const defaultUserSettings = {
     showLogo: true
   },
   slides: {
+    enabled: true,
     durationSeconds: 10
   }
 };
@@ -287,10 +288,11 @@ export async function loadI18nConfig() {
 export async function saveI18nConfig(nextConfig = {}) {
   const userConfig = await readJsonFile(i18nFile, {});
 
-  const userSettings = nextConfig.language || nextConfig.layout
+  const userSettings = nextConfig.language || nextConfig.layout || nextConfig.slides
     ? await saveUserSettings({
         language: nextConfig.language,
-        layout: nextConfig.layout
+        layout: nextConfig.layout,
+        slides: nextConfig.slides
       })
     : await loadUserSettings();
 

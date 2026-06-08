@@ -10,6 +10,7 @@
     "showLogo": true
   },
   "slides": {
+    "enabled": true,
     "durationSeconds": 10
   }
 }

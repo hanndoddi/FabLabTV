@@ -241,8 +241,9 @@ function startSlideRotation() {
   stopSlideRotation();
 
   const slides = statusCache?.slides || [];
+  const slidesEnabled = statusCache?.i18n?.slides?.enabled !== false;
 
-  if (!slides.length || statusCache?.videos?.length) {
+  if (!slidesEnabled || !slides.length || statusCache?.videos?.length) {
     return;
   }
 
