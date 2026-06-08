@@ -293,8 +293,8 @@ app.put("/api/video-sources", async (req, res) => {
     localVideos: req.body.localVideos !== false,
     fabAcademyHighlights: req.body.fabAcademyHighlights === true,
     fabAcademyHighlightsAfterHours: req.body.fabAcademyHighlightsAfterHours === true,
-    localVideosPerCycle: Number(req.body.localVideosPerCycle) || 1,
-    fabAcademyHighlightsPerCycle: Number(req.body.fabAcademyHighlightsPerCycle) || 1
+    localVideosPerCycle: req.body.localVideosPerCycle,
+    fabAcademyHighlightsPerCycle: req.body.fabAcademyHighlightsPerCycle
   });
 
   await broadcastStatus();

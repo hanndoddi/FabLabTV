@@ -100,13 +100,18 @@ export async function deleteStaffProfile(filename) {
   return await saveStaffProfiles(profiles);
 }
 
+function normalizeCycleCount(value, fallback = 1) {
+  const number = Number(value);
+  return Number.isFinite(number) ? Math.max(0, Math.floor(number)) : fallback;
+}
+
 function normalizeVideoSourcesConfig(value = {}) {
   return {
     localVideos: value.localVideos !== false,
     fabAcademyHighlights: value.fabAcademyHighlights === true,
     fabAcademyHighlightsAfterHours: value.fabAcademyHighlightsAfterHours === true,
-    localVideosPerCycle: Math.max(0, Number(value.localVideosPerCycle) || 1),
-    fabAcademyHighlightsPerCycle: Math.max(0, Number(value.fabAcademyHighlightsPerCycle) || 1)
+    localVideosPerCycle: normalizeCycleCount(value.localVideosPerCycle),
+    fabAcademyHighlightsPerCycle: normalizeCycleCount(value.fabAcademyHighlightsPerCycle)
   };
 }
 
@@ -208,8 +213,8 @@ function buildBalancedPlaylist(localVideos, highlightVideos, options = {}) {
   if (!localVideos.length) return shuffleItems(highlightVideos);
   if (!highlightVideos.length) return shuffleItems(localVideos);
 
-  const localPerCycle = Math.max(0, Number(options.localVideosPerCycle) || 1);
-  const highlightsPerCycle = Math.max(0, Number(options.fabAcademyHighlightsPerCycle) || 1);
+  const localPerCycle = normalizeCycleCount(options.localVideosPerCycle);
+  const highlightsPerCycle = normalizeCycleCount(options.fabAcademyHighlightsPerCycle);
 
   if (!localPerCycle && !highlightsPerCycle) {
     return [];
