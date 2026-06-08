@@ -169,6 +169,7 @@ function renderRemoteNowPlaying(status) {
 
 
   const videos = status.videos || [];
+  const slides = status.slides || []; 
   const item = status.nowPlayingOverride || videos[status.currentVideoIndex || 0];
 
   if (!item) {
@@ -325,6 +326,7 @@ function renderPlaylistInventoryStatus(status) {
   if (!playlistInventoryStatus) return;
 
   const videos = status.videos || [];
+  const slides = status.slides || [];
 
   const localCount = videos.filter(
     (video) => video.source === "local"
@@ -339,7 +341,8 @@ function renderPlaylistInventoryStatus(status) {
     <small>
       Local videos: ${localCount}<br>
       Highlights: ${highlightCount}<br>
-      Total items: ${videos.length}
+      Total video items: ${videos.length}<br>
+      Slides available: ${slides.length}
     </small>
   `;
 }
