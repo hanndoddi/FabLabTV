@@ -247,12 +247,22 @@ function clearOneTimeVideo() {
 
 function playVideo(index, { force = false, notify = false } = {}) {
   if (!statusCache || !statusCache.videos.length) {
+    const firstSlide = statusCache?.slides?.[0];
+
     currentVideoUrl = "";
     isOneTimeVideo = false;
     video.removeAttribute("src");
-    videoEmpty.style.display = "grid";
-    videoEmpty.textContent = getEmptyVideoMessage();
-    nowPlaying.textContent = getEmptyVideoMessage();
+
+    if (firstSlide) {
+      videoEmpty.style.display = "none";
+      showSlideDisplay(firstSlide);
+    } else {
+      showVideoDisplay();
+      videoEmpty.style.display = "grid";
+      videoEmpty.textContent = getEmptyVideoMessage();
+      nowPlaying.textContent = getEmptyVideoMessage();
+    }
+
     return;
   }
 
