@@ -57,6 +57,9 @@ const showLogoToggle = document.querySelector("#showLogoToggle");
 const slideDurationSeconds = document.querySelector("#slideDurationSeconds");
 const slidesEnabled = document.querySelector("#slidesEnabled");
 
+const slides = status.slides || [];
+const slideSettings = status.i18n?.slides || {};
+
 const weatherLocation = document.querySelector("#weatherLocation");
 const weatherLatitude = document.querySelector("#weatherLatitude");
 const weatherLongitude = document.querySelector("#weatherLongitude");
@@ -331,6 +334,7 @@ function renderPlaylistInventoryStatus(status) {
 
   const videos = status.videos || [];
   const slides = status.slides || [];
+  const slideSettings = status.i18n?.slides || {};
 
   const localCount = videos.filter(
     (video) => video.source === "local"
@@ -346,7 +350,11 @@ function renderPlaylistInventoryStatus(status) {
       Local videos: ${localCount}<br>
       Highlights: ${highlightCount}<br>
       Total video items: ${videos.length}<br>
-      Slides available: ${slides.length}
+      ${
+        slideSettings.enabled === false
+          ? "Slides: disabled"
+          : `Slides available: ${slides.length}<br>Slide duration: ${escapeHtml(slideSettings.durationSeconds ?? 10)}s`
+      }
     </small>
   `;
 }
