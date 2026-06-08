@@ -248,8 +248,19 @@ async function loadUserSettings() {
 }
 
 async function saveUserSettings(nextSettings = {}) {
-  const language = normalizeLanguage(nextSettings.language);
-  const settings = { ...defaultUserSettings, ...nextSettings, language };
+  const currentSettings = await loadUserSettings();
+  const language = normalizeLanguage(nextSettings.language || currentSettings.language);
+  const settings = {
+    ...defaultUserSettings,
+    ...currentSettings,
+    ...nextSettings,
+    language,
+    layout: {
+      ...defaultUserSettings.layout,
+      ...(currentSettings.layout || {}),
+      ...(nextSettings.layout || {})
+    }
+  };
   await writeJsonFile(userSettingsFile, settings);
   return settings;
 }
@@ -263,8 +274,11 @@ export async function loadI18nConfig() {
 export async function saveI18nConfig(nextConfig = {}) {
   const userConfig = await readJsonFile(i18nFile, {});
 
-  const userSettings = nextConfig.language
-    ? await saveUserSettings({ language: nextConfig.language })
+  const userSettings = nextConfig.language || nextConfig.layout
+    ? await saveUserSettings({
+        language: nextConfig.language,
+        layout: nextConfig.layout
+      })
     : await loadUserSettings();
 
   const shouldSaveLabels = Object.hasOwn(nextConfig, "labels");

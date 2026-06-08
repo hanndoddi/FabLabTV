@@ -45,6 +45,8 @@ const saveLanguage = document.querySelector("#saveLanguage");
 const labelEditor = document.querySelector("#labelEditor");
 const saveLabels = document.querySelector("#saveLabels");
 
+const showClockToggle = document.querySelector("#showClockToggle");
+
 const weatherLocation = document.querySelector("#weatherLocation");
 const weatherLatitude = document.querySelector("#weatherLatitude");
 const weatherLongitude = document.querySelector("#weatherLongitude");
@@ -417,6 +419,10 @@ function renderLanguageControls(status) {
       <input class="label-input" data-key="${escapeHtml(key)}" value="${escapeHtml(selectedLabels[key] || fallback)}" />
     </label>
   `).join("");
+
+  if (showClockToggle) {
+    showClockToggle.checked = i18n.layout?.showClock !== false;
+  }
 }
 
 function renderNewsHistory(newsItems) {
@@ -653,6 +659,11 @@ languageSelect?.addEventListener("change", () => {
   renderLanguageControls(latestStatus);
 });
 
+showClockToggle?.addEventListener("change", async () => {
+  await putJson("/api/settings/layout", {
+    showClock: showClockToggle.checked
+  });
+});
 
 showAddStaff?.addEventListener("click", () => {
   if (!addStaffPanel) return;

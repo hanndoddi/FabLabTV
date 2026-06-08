@@ -326,6 +326,20 @@ app.put("/api/i18n/language", async (req, res) => {
   res.json(await buildStatus());
 });
 
+app.put("/api/settings/layout", async (req, res) => {
+  const current = await loadI18nConfig();
+
+  await saveI18nConfig({
+    language: current.language,
+    layout: {
+      showClock: req.body.showClock !== false
+    }
+  });
+
+  await broadcastStatus();
+  res.json(await buildStatus());
+});
+
 app.put("/api/i18n/labels/:language", async (req, res) => {
   const current = await loadI18nConfig();
   const language = normalizeLanguage(req.params.language);
