@@ -12,6 +12,8 @@ data/userSettings.json
 # Keep the folders in Git via .gitkeep, but ignore uploaded user media by default.
 videos/*
 !videos/.gitkeep
+slides/*
+!slides/.gitkeep
 staff/*
 !staff/.gitkeep
 !staff/Neil.jpg
