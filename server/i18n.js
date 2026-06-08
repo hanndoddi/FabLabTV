@@ -209,7 +209,8 @@ export const defaultUserSettings = {
     showStaff: true,
     showGlobalPulse: true,
     showLocalPulse: true,
-    showNowPlaying: true
+    showNowPlaying: true,
+    showLogo: true
   }
 };
 

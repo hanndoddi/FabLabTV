@@ -24,6 +24,7 @@ const globalPulseLabel = document.querySelector("#globalPulse .pulse-label");
 const localPulseLabel = document.querySelector("#localPulse .pulse-label");
 const clock = document.querySelector("#clock");
 const stationLogoImage = document.querySelector(".station-logo img");
+const stationLogo = document.querySelector(".station-logo");
 const audioEnableOverlay = document.querySelector("#audioEnableOverlay");
 const enableAudioOnTv = document.querySelector("#enableAudioOnTv");
 
@@ -54,6 +55,7 @@ function applyLayoutSettings(status) {
   setBlockVisibility(globalPulse, layout.showGlobalPulse !== false);
   setBlockVisibility(localPulse, layout.showLocalPulse !== false);
   setBlockVisibility(nowBox, layout.showNowPlaying !== false);
+  setBlockVisibility(stationLogo, layout.showLogo !== false);
 }
 
 const manualDateNames = {
