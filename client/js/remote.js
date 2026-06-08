@@ -48,6 +48,7 @@ const saveLabels = document.querySelector("#saveLabels");
 const showClockToggle = document.querySelector("#showClockToggle");
 const showTechNewsToggle = document.querySelector("#showTechNewsToggle");
 const showStaffToggle = document.querySelector("#showStaffToggle");
+const showGlobalPulseToggle = document.querySelector("#showGlobalPulseToggle");
 
 const weatherLocation = document.querySelector("#weatherLocation");
 const weatherLatitude = document.querySelector("#weatherLatitude");
@@ -433,6 +434,10 @@ function renderLanguageControls(status) {
   if (showStaffToggle) {
     showStaffToggle.checked = i18n.layout?.showStaff !== false;
   }
+
+  if (showGlobalPulseToggle) {
+    showGlobalPulseToggle.checked = i18n.layout?.showGlobalPulse !== false;
+  }
 }
 
 function renderNewsHistory(newsItems) {
@@ -684,6 +689,12 @@ showTechNewsToggle?.addEventListener("change", async () => {
 showStaffToggle?.addEventListener("change", async () => {
   await putJson("/api/settings/layout", {
     showStaff: showStaffToggle.checked
+  });
+});
+
+showGlobalPulseToggle?.addEventListener("change", async () => {
+  await putJson("/api/settings/layout", {
+    showGlobalPulse: showGlobalPulseToggle.checked
   });
 });
 

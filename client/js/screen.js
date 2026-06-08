@@ -50,6 +50,7 @@ function applyLayoutSettings(status) {
   setBlockVisibility(clock, layout.showClock !== false);
   setBlockVisibility(newsCard, layout.showTechNews !== false);
   setBlockVisibility(onCallCard, layout.showStaff !== false);
+  setBlockVisibility(globalPulse, layout.showGlobalPulse !== false);
 }
 
 const manualDateNames = {

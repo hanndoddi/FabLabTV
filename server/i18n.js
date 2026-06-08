@@ -206,7 +206,8 @@ export const defaultUserSettings = {
   layout: {
     showClock: true,
     showTechNews: true,
-    showStaff: true
+    showStaff: true,
+    showGlobalPulse: true
   }
 };
 
