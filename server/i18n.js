@@ -208,7 +208,8 @@ export const defaultUserSettings = {
     showTechNews: true,
     showStaff: true,
     showGlobalPulse: true,
-    showLocalPulse: true
+    showLocalPulse: true,
+    showNowPlaying: true
   }
 };
 

@@ -11,6 +11,7 @@ const staffImage = document.querySelector("#staffImage");
 const staffName = document.querySelector("#staffName");
 const staffStatus = document.querySelector("#staffStatus");
 const nowPlaying = document.querySelector("#nowPlaying");
+const nowBox = document.querySelector(".now-box");
 
 const newsCard = document.querySelector(".news-card");
 const newsContent = document.querySelector("#newsContent");
@@ -52,6 +53,7 @@ function applyLayoutSettings(status) {
   setBlockVisibility(onCallCard, layout.showStaff !== false);
   setBlockVisibility(globalPulse, layout.showGlobalPulse !== false);
   setBlockVisibility(localPulse, layout.showLocalPulse !== false);
+  setBlockVisibility(nowBox, layout.showNowPlaying !== false);
 }
 
 const manualDateNames = {
