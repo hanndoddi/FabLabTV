@@ -194,7 +194,7 @@ async function listCachedPdfPages(filename) {
   const cacheDir = getPdfCacheDir(filename);
 
   try {
-    const files = await listFiles(cacheDir, [".png"]);
+    const files = await listFiles(cacheDir, [".jpg", ".jpeg"]);
     return files.map((file) => ({
       file,
       cacheDir
@@ -249,8 +249,8 @@ async function renderPdfToCacheUncached(filename) {
         viewport
       }).promise;
 
-      const outputPath = path.join(cacheDir, `page-${pageNumber}.png`);
-      await fs.writeFile(outputPath, canvas.toBuffer("image/png"));
+      const outputPath = path.join(cacheDir, `page-${pageNumber}.jpg`);
+      await fs.writeFile(outputPath, canvas.toBuffer("image/jpeg", 85));
     }
 
     console.log(`[Slides] Cached ${pdf.numPages} pages from ${filename}`);

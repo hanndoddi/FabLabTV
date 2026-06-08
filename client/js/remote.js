@@ -14,9 +14,15 @@ const nextVideo = document.querySelector("#nextVideo");
 const pauseVideo = document.querySelector("#pauseVideo");
 const videoCount = document.querySelector("#videoCount");
 const remoteNowPlaying = document.querySelector("#remoteNowPlaying");
+
 const videoUpload = document.querySelector("#videoUpload");
 const uploadVideo = document.querySelector("#uploadVideo");
 const videoUploadStatus = document.querySelector("#videoUploadStatus");
+
+const slideUpload = document.querySelector("#slideUpload");
+const uploadSlide = document.querySelector("#uploadSlide");
+const slideUploadStatus = document.querySelector("#slideUploadStatus");
+
 const localVideosEnabled = document.querySelector("#localVideosEnabled");
 const fabHighlightsEnabled = document.querySelector("#fabHighlightsEnabled");
 const fabHighlightsAfterHoursEnabled = document.querySelector("#fabHighlightsAfterHoursEnabled");
@@ -883,6 +889,15 @@ uploadVideo?.addEventListener("click", async () => {
     fileInput: videoUpload,
     statusElement: videoUploadStatus,
     button: uploadVideo
+  });
+});
+
+uploadSlide?.addEventListener("click", async () => {
+  await uploadFile({
+    endpoint: "/api/upload/slide",
+    fileInput: slideUpload,
+    statusElement: slideUploadStatus,
+    button: uploadSlide
   });
 });
 

@@ -142,6 +142,26 @@
         <button id="uploadVideo" class="secondary" type="button">Upload local video to this TV</button>
         <p id="videoUploadStatus" class="upload-status"></p>
       </div>
+      <div class="upload-box local-upload-box">
+        <h3>Add a slide</h3>
+        <p>
+          Upload images or PDF files into the local
+          <strong>slides/</strong> folder. PDFs are automatically converted
+          into slide pages.
+        </p>
+
+        <input
+          id="slideUpload"
+          type="file"
+          accept=".pdf,image/png,image/jpeg,image/webp,image/gif"
+        />
+
+        <button id="uploadSlide" class="secondary" type="button">
+          Upload slide to this TV
+        </button>
+
+        <p id="slideUploadStatus" class="upload-status"></p>
+      </div>
     </section>
 
     <section class="panel branding-control-panel">
