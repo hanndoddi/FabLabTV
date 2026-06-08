@@ -39,6 +39,12 @@ Fab Lab TV has two main screens:
 
 ---
 
+## Documentation
+
+- [Changelog](CHANGELOG.md)
+
+---
+
 ## Features
 
 ### Project video playback
