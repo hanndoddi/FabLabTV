@@ -146,6 +146,11 @@
         <div id="fabPlaylistSummary" class="playlist-summary"></div>
         <div id="fabVideoCatalog" class="fab-video-catalog"></div>
       </div>
+    </section>
+
+    <section class="panel">
+      <h2>Uploads</h2>
+      <p>Add local media files to this FabLabTV installation.</p>
 
       <div class="upload-box local-upload-box">
         <h3>Add a local video</h3>
@@ -154,6 +159,7 @@
         <button id="uploadVideo" class="secondary" type="button">Upload local video to this TV</button>
         <p id="videoUploadStatus" class="upload-status"></p>
       </div>
+
       <div class="upload-box local-upload-box">
         <h3>Add a slide</h3>
         <p>
@@ -176,8 +182,16 @@
       </div>
     </section>
 
+
     <section class="panel branding-control-panel">
-      <h2>Branding</h2>
+      <div class="panel-title-row">
+        <h2>Branding & Lab Identity</h2>
+
+        <label class="panel-visibility-toggle">
+          <input id="showLogoToggle" type="checkbox" />
+          <span>Show on TV</span>
+        </label>
+      </div>
       <p>FabLabTV uses the built-in <strong>branding/fablab.png</strong> logo unless your lab uploads its own logo. Uploaded logos are saved as <strong>branding/logo.png</strong>.</p>
       <div class="branding-preview-row">
         <img id="brandingLogoPreview" class="branding-logo-preview" src="/branding/current-logo.png" alt="Current TV logo" />
@@ -189,18 +203,6 @@
           <p id="logoUploadStatus" class="upload-status"></p>
         </div>
       </div>
-    </section>
-
-    <section class="panel">
-      <h2>Screen Layout</h2>
-      <p>Choose which blocks are visible on the TV screen.</p>
-      <label class="source-toggle-card">
-        <input id="showLogoToggle" type="checkbox" />
-        <span>
-          <strong>Show Logo</strong>
-          <small>Display the FabLab logo on the TV screen.</small>
-        </span>
-      </label>
     </section>
 
     <section class="panel">
@@ -250,17 +252,13 @@
       </div>
       <button id="saveWeather">Save weather location</button>
     </section>
-    <section class="panel">
-      <h2>Current Opening Hours Status</h2>
-
-      <div id="openingHoursStatusCard">
-        <strong id="openingHoursStatusState">Unknown</strong>
-        <div id="openingHoursStatusTime"></div>
-      </div>
-    </section>
 
     <section class="panel">
       <h2>Opening Hours</h2>
+      <div id="openingHoursStatusCard" class="opening-hours-status-card">
+        <strong id="openingHoursStatusState">Unknown</strong>
+        <div id="openingHoursStatusTime"></div>
+      </div>
       <p>Leave a day empty to show it as closed.</p>
       <div id="openingHoursEditor" class="opening-hours-editor"></div>
       <button id="saveOpeningHours">Save opening hours</button>
