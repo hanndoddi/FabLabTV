@@ -14,6 +14,8 @@ import chokidar from "chokidar";
 import { getNewsItems } from "./services/newsService.js";
 import { loadAppConfig, saveAppConfig } from "./models/configModel.js";
 
+import tzLookup from "tz-lookup";
+
 import { config } from "./config.js";
 import {
   getVideoLibrary,
@@ -628,6 +630,22 @@ app.post("/api/announcement", async (req, res) => {
   await saveState({ announcement: String(req.body.announcement || "").trim() });
   await broadcastStatus();
   res.json(await buildStatus());
+});
+
+app.post("/api/settings/location/timezone", (req, res) => {
+  const latitude = Number(req.body.latitude);
+  const longitude = Number(req.body.longitude);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return res.status(400).json({ error: "Latitude and longitude are required numbers" });
+  }
+
+  try {
+    const timezone = tzLookup(latitude, longitude);
+    res.json({ timezone });
+  } catch (error) {
+    res.status(400).json({ error: "Could not determine timezone for this location" });
+  }
 });
 
 io.on("connection", async (socket) => {

@@ -927,10 +927,27 @@ cancelLocationMap?.addEventListener("click", () => {
   locationMapDialog?.classList.add("is-hidden");
 });
 
-useLocationMap?.addEventListener("click", () => {
+useLocationMap?.addEventListener("click", async () => {
   if (pendingLocationLatLng) {
-    locationLatitude.value = pendingLocationLatLng.lat.toFixed(6);
-    locationLongitude.value = pendingLocationLatLng.lng.toFixed(6);
+    const latitude = pendingLocationLatLng.lat.toFixed(6);
+    const longitude = pendingLocationLatLng.lng.toFixed(6);
+
+    locationLatitude.value = latitude;
+    locationLongitude.value = longitude;
+
+    try {
+      const result = await postJson("/api/settings/location/timezone", {
+        latitude,
+        longitude
+      });
+
+      if (result?.timezone) {
+        locationTimezone.value = result.timezone;
+      }
+    } catch (error) {
+      console.error("Timezone lookup failed", error);
+    }
+
     renderLocationMapSummary();
   }
 

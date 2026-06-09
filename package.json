@@ -23,7 +23,8 @@
     "cors": "^2.8.5",
     "express": "^4.19.2",
     "pdfjs-dist": "^6.0.227",
-    "socket.io": "^4.7.5"
+    "socket.io": "^4.7.5",
+    "tz-lookup": "^6.1.25"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
