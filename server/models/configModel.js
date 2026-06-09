@@ -1,6 +1,8 @@
 import path from "node:path";
 import { config as serverConfig } from "../config.js";
-import { readJsonFile } from "../utils/filesystem.js";
+import { readJsonFile, writeJsonFile } from "../utils/filesystem.js";
+
+const appConfigFile = path.join(serverConfig.dataDir, "config.json");
 
 export const defaultAppConfig = {
   labName: "Fab Lab",
@@ -37,8 +39,7 @@ export const defaultAppConfig = {
 };
 
 export async function loadAppConfig() {
-  const filePath = path.join(serverConfig.dataDir, "config.json");
-  const userConfig = await readJsonFile(filePath, {});
+  const userConfig = await readJsonFile(appConfigFile, {});
   return {
     ...defaultAppConfig,
     ...userConfig,
@@ -46,4 +47,28 @@ export async function loadAppConfig() {
     visitorStats: { ...defaultAppConfig.visitorStats, ...(userConfig.visitorStats || {}) },
     machineStats: { ...defaultAppConfig.machineStats, ...(userConfig.machineStats || {}) }
   };
+}
+
+export async function saveAppConfig(nextConfig = {}) {
+  const currentConfig = await readJsonFile(appConfigFile, {});
+
+  const merged = {
+    ...currentConfig,
+    ...nextConfig,
+    weather: {
+      ...(currentConfig.weather || {}),
+      ...(nextConfig.weather || {})
+    },
+    visitorStats: {
+      ...(currentConfig.visitorStats || {}),
+      ...(nextConfig.visitorStats || {})
+    },
+    machineStats: {
+      ...(currentConfig.machineStats || {}),
+      ...(nextConfig.machineStats || {})
+    }
+  };
+
+  await writeJsonFile(appConfigFile, merged);
+  return loadAppConfig();
 }

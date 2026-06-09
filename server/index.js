@@ -12,7 +12,7 @@ import { Server } from "socket.io";
 import chokidar from "chokidar";
 
 import { getNewsItems } from "./services/newsService.js";
-import { loadAppConfig } from "./models/configModel.js";
+import { loadAppConfig, saveAppConfig } from "./models/configModel.js";
 
 import { config } from "./config.js";
 import {
@@ -356,6 +356,29 @@ app.get("/api/i18n", async (_req, res) => {
 app.put("/api/i18n/language", async (req, res) => {
   await saveI18nConfig({
     language: normalizeLanguage(req.body.language)
+  });
+
+  await broadcastStatus();
+  res.json(await buildStatus());
+});
+
+app.put("/api/settings/location", async (req, res) => {
+  const current = await loadAppConfig();
+  const latitude = Number(req.body.latitude);
+  const longitude = Number(req.body.longitude);
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return res.status(400).json({ error: "Location latitude and longitude are required numbers" });
+  }
+
+  await saveAppConfig({
+    timezone: cleanText(req.body.timezone) || current.timezone,
+    weather: {
+      ...(current.weather || {}),
+      location: cleanText(req.body.location) || current.weather?.location || "Local weather",
+      latitude,
+      longitude
+    }
   });
 
   await broadcastStatus();
