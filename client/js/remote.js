@@ -64,18 +64,16 @@ const slideDurationSeconds = document.querySelector("#slideDurationSeconds");
 const slidesEnabled = document.querySelector("#slidesEnabled");
 const slidesPerCycle = document.querySelector("#slidesPerCycle");
 
-const slides = status.slides || [];
-const slideSettings = status.i18n?.slides || {};
+//const slides = status.slides || [];
+//const slideSettings = status.i18n?.slides || {};
 
 const locationName = document.querySelector("#locationName");
 const locationLatitude = document.querySelector("#locationLatitude");
 const locationLongitude = document.querySelector("#locationLongitude");
 const locationTimezone = document.querySelector("#locationTimezone");
 
-const weatherLocation = document.querySelector("#weatherLocation");
-const weatherLatitude = document.querySelector("#weatherLatitude");
-const weatherLongitude = document.querySelector("#weatherLongitude");
-const saveWeather = document.querySelector("#saveWeather");
+const saveLocation = document.querySelector("#saveLocation");
+const locationSaveStatus = document.querySelector("#locationSaveStatus");
 
 const openingHoursEditor = document.querySelector("#openingHoursEditor");
 const saveOpeningHours = document.querySelector("#saveOpeningHours");
@@ -560,13 +558,6 @@ function renderLocation(status) {
   if (locationTimezone) locationTimezone.value = status.config?.timezone || "";
 }
 
-function renderWeather(localConfig) {
-  const weather = localConfig.weather || {};
-  weatherLocation.value = weather.location || "";
-  weatherLatitude.value = weather.latitude ?? "";
-  weatherLongitude.value = weather.longitude ?? "";
-}
-
 function renderOpeningHoursStatus(status) {
   if (!openingHoursStatusState || !openingHoursStatusTime) return;
 
@@ -583,6 +574,8 @@ function renderOpeningHoursStatus(status) {
 }
 
 function renderOpeningHours(localConfig) {
+  if (!openingHoursEditor) return;
+
   const weekly = localConfig.openingHours?.weekly || {};
   openingHoursEditor.innerHTML = "";
 
@@ -598,10 +591,12 @@ function renderOpeningHours(localConfig) {
       <input class="close-time" type="time" value="${escapeHtml(range.close || "")}" />
       <button class="small secondary clear-day" type="button">Closed</button>
     `;
-    row.querySelector(".clear-day").addEventListener("click", () => {
+
+    row.querySelector(".clear-day")?.addEventListener("click", () => {
       row.querySelector(".open-time").value = "";
       row.querySelector(".close-time").value = "";
     });
+
     openingHoursEditor.appendChild(row);
   }
 }
@@ -632,11 +627,14 @@ function renderEditableList(container, items, onDelete) {
 
 function renderLocalPulseControls(status) {
   const localConfig = status.localPulse?.config || {};
-  renderWeather(localConfig);
+
   renderOpeningHours(localConfig);
-  renderEditableList(messageList, localConfig.messages || [], async (id) => {
-    await deleteJson(`/api/local-pulse/messages/${encodeURIComponent(id)}`);
-  });
+
+  if (messageList) {
+    renderEditableList(messageList, localConfig.messages || [], async (id) => {
+      await deleteJson(`/api/local-pulse/messages/${encodeURIComponent(id)}`);
+    });
+  }
 }
 
 function render(status) {
@@ -840,6 +838,23 @@ pauseVideo?.addEventListener("click", async () => {
   await postJson("/api/video/pause-toggle");
 });
 
+saveLocation?.addEventListener("click", async () => {
+  if (locationSaveStatus) locationSaveStatus.textContent = "Saving location...";
+
+  try {
+    await putJson("/api/settings/location", {
+      location: locationName.value,
+      latitude: locationLatitude.value,
+      longitude: locationLongitude.value,
+      timezone: locationTimezone.value
+    });
+
+    if (locationSaveStatus) locationSaveStatus.textContent = "Location saved.";
+  } catch (error) {
+    if (locationSaveStatus) locationSaveStatus.textContent = `Save failed: ${error.message}`;
+  }
+});
+
 let videoSourcesSaveTimer = null;
 
 async function saveVideoSourcesNow() {
@@ -926,15 +941,7 @@ uploadStaff?.addEventListener("click", async () => {
   if (staffUploadNote) staffUploadNote.value = "";
 });
 
-saveWeather.addEventListener("click", async () => {
-  await putJson("/api/local-pulse/weather", {
-    location: weatherLocation.value,
-    latitude: weatherLatitude.value,
-    longitude: weatherLongitude.value
-  });
-});
-
-saveOpeningHours.addEventListener("click", async () => {
+saveOpeningHours?.addEventListener("click", async () => {
   const weekly = {};
 
   for (const row of openingHoursEditor.querySelectorAll(".hours-row")) {
@@ -946,7 +953,7 @@ saveOpeningHours.addEventListener("click", async () => {
   await putJson("/api/local-pulse/opening-hours", { enabled: true, weekly });
 });
 
-addMessage.addEventListener("click", async () => {
+addMessage?.addEventListener("click", async () => {
   let imageUrl = "";
 
   if (messageImage?.files?.[0]) {

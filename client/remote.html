@@ -254,12 +254,7 @@
 
           <p>
             Controls the clock block shown on the TV screen. The clock uses the lab
-            timezone configured for this FabLabTV installation.
-          </p>
-
-          <p class="section-help">
-            Timezone is currently read from data/config.json. A Remote UI timezone picker
-            will need a small config save API before it can be edited here.
+            timezone from Location.
           </p>
         </section>
 
@@ -270,24 +265,27 @@
           </p>
 
           <div class="form-grid">
-            <label>Location name<input id="locationName" readonly /></label>
-            <label>Latitude<input id="locationLatitude" readonly /></label>
-            <label>Longitude<input id="locationLongitude" readonly /></label>
-            <label>Timezone<input id="locationTimezone" readonly /></label>
+            <label>Location name<input id="locationName" /></label>
+            <label>Latitude<input id="locationLatitude" type="number" step="0.0001" /></label>
+            <label>Longitude<input id="locationLongitude" type="number" step="0.0001" /></label>
+            <label>Timezone<input id="locationTimezone" placeholder="Atlantic/Reykjavik" /></label>
           </div>
+
+          <button id="saveLocation">Save location</button>
+          <p id="locationSaveStatus" class="upload-status"></p>
         </section>
 
         <section id="weather" class="panel">
-          <h2>Local Pulse Weather</h2>
-          <p>Choose the weather location shown in Local Pulse. Use decimal latitude/longitude.</p>
-          <div class="form-grid">
-            <label>Location name<input id="weatherLocation" placeholder="Reykjavik" /></label>
-            <label>Latitude<input id="weatherLatitude" type="number" step="0.0001" placeholder="64.1466" /></label>
-            <label>Longitude<input id="weatherLongitude" type="number" step="0.0001" placeholder="-21.9426" /></label>
-          </div>
-          <button id="saveWeather">Save weather location</button>
-        </section>
+          <h2>Weather</h2>
+          <p>
+            Weather uses the Location settings above.
+          </p>
 
+          <p class="section-help">
+            Change location name, latitude, and longitude in the Location card.
+          </p>
+        </section>
+ 
         <section id="opening-hours" class="panel">
           <h2>Opening Hours</h2>
           <div id="openingHoursStatusCard" class="opening-hours-status-card">
