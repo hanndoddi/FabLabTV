@@ -264,6 +264,25 @@
             This is the lab location used by weather, clock, and opening hours.
           </p>
 
+          <button id="openLocationMap" class="secondary" type="button">Choose on map</button>
+
+          <div id="locationMapDialog" class="modal is-hidden" role="dialog" aria-modal="true" aria-labelledby="locationMapTitle">
+            <div class="modal-panel">
+              <h2 id="locationMapTitle">Choose location on map</h2>
+              <p class="section-help">Map picker will be added next.</p>
+              <div id="locationMap" class="location-map-placeholder">
+                <div>
+                  <strong>Selected location</strong>
+                  <span id="locationMapSummary">Waiting for location...</span>
+                </div>
+              </div>
+              <div class="remote-video-actions">
+                <button id="cancelLocationMap" class="secondary" type="button">Cancel</button>
+                <button id="useLocationMap" type="button">Use this location</button>
+              </div>
+            </div>
+          </div>
+
           <div class="form-grid">
             <label>Location name<input id="locationName" /></label>
             <label>Latitude<input id="locationLatitude" type="number" step="0.0001" /></label>

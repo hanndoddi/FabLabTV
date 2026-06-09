@@ -72,6 +72,13 @@ const locationLatitude = document.querySelector("#locationLatitude");
 const locationLongitude = document.querySelector("#locationLongitude");
 const locationTimezone = document.querySelector("#locationTimezone");
 
+const openLocationMap = document.querySelector("#openLocationMap");
+const locationMapDialog = document.querySelector("#locationMapDialog");
+const cancelLocationMap = document.querySelector("#cancelLocationMap");
+const useLocationMap = document.querySelector("#useLocationMap");
+
+const locationMapSummary = document.querySelector("#locationMapSummary");
+
 const saveLocation = document.querySelector("#saveLocation");
 const locationSaveStatus = document.querySelector("#locationSaveStatus");
 
@@ -549,6 +556,21 @@ function renderNewsHistory(newsItems) {
   }
 }
 
+function renderLocationMapSummary() {
+  if (!locationMapSummary) return;
+
+  const name = locationName?.value || "Unnamed location";
+  const latitude = locationLatitude?.value || "No latitude";
+  const longitude = locationLongitude?.value || "No longitude";
+  const timezone = locationTimezone?.value || "No timezone";
+
+  locationMapSummary.innerHTML = `
+    ${escapeHtml(name)}<br>
+    ${escapeHtml(latitude)}, ${escapeHtml(longitude)}<br>
+    ${escapeHtml(timezone)}
+  `;
+}
+
 function renderLocation(status) {
   const weather = status.config?.weather || {};
 
@@ -556,6 +578,7 @@ function renderLocation(status) {
   if (locationLatitude) locationLatitude.value = weather.latitude ?? "";
   if (locationLongitude) locationLongitude.value = weather.longitude ?? "";
   if (locationTimezone) locationTimezone.value = status.config?.timezone || "";
+  renderLocationMapSummary();
 }
 
 function renderOpeningHoursStatus(status) {
@@ -853,6 +876,19 @@ saveLocation?.addEventListener("click", async () => {
   } catch (error) {
     if (locationSaveStatus) locationSaveStatus.textContent = `Save failed: ${error.message}`;
   }
+});
+
+openLocationMap?.addEventListener("click", () => {
+  renderLocationMapSummary();
+  locationMapDialog?.classList.remove("is-hidden");
+});
+
+cancelLocationMap?.addEventListener("click", () => {
+  locationMapDialog?.classList.add("is-hidden");
+});
+
+useLocationMap?.addEventListener("click", () => {
+  locationMapDialog?.classList.add("is-hidden");
 });
 
 let videoSourcesSaveTimer = null;
