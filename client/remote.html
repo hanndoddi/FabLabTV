@@ -14,7 +14,14 @@
     </header>
 
     <section class="panel staff-control-panel">
-      <h2>Who is on call?</h2>
+      <div class="panel-title-row">
+        <h2>Who is on call?</h2>
+
+        <label class="panel-visibility-toggle">
+          <input id="showStaffToggle" type="checkbox" />
+          <span>Show on TV</span>
+        </label>
+      </div>
       <p>Select the staff member currently available on the TV. Each staff member can also have saved profile text, such as pronouns, specialties, or support notes.</p>
       <div id="staffList" class="staff-list"></div>
 
@@ -36,9 +43,14 @@
     <section class="panel video-control-panel">
       <div class="panel-heading">
         <div>
-          <h2>Video</h2>
-          <p>Control what is playing on the TV and choose where videos come from.</p>
+          <h2>Now Playing</h2>
+          <p>Control playback and choose what appears in the TV playlist.</p>
         </div>
+
+        <label class="panel-visibility-toggle">
+          <input id="showNowPlayingToggle" type="checkbox" />
+          <span>Show Now Playing</span>
+        </label>
       </div>
 
       <div class="video-source-box primary-video-sources">
@@ -183,48 +195,6 @@
       <h2>Screen Layout</h2>
       <p>Choose which blocks are visible on the TV screen.</p>
       <label class="source-toggle-card">
-        <input id="showClockToggle" type="checkbox" />
-        <span>
-          <strong>Show clock</strong>
-          <small>Display the day, date, and time on the TV screen.</small>
-        </span>
-      </label>
-      <label class="source-toggle-card">
-        <input id="showTechNewsToggle" type="checkbox" />
-        <span>
-          <strong>Show Tech News</strong>
-          <small>Display the Tech News block on the TV screen.</small>
-        </span>
-      </label>
-      <label class="source-toggle-card">
-        <input id="showStaffToggle" type="checkbox" />
-        <span>
-          <strong>Show Staff Card</strong>
-          <small>Display the On Call staff card on the TV screen.</small>
-        </span>
-      </label>
-      <label class="source-toggle-card">
-        <input id="showGlobalPulseToggle" type="checkbox" />
-        <span>
-          <strong>Show Global Pulse</strong>
-          <small>Display the Global Pulse block on the TV screen.</small>
-        </span>
-      </label>
-      <label class="source-toggle-card">
-        <input id="showLocalPulseToggle" type="checkbox" />
-        <span>
-          <strong>Show Local Pulse</strong>
-          <small>Display the Local Pulse block on the TV screen.</small>
-        </span>
-      </label>
-      <label class="source-toggle-card">
-        <input id="showNowPlayingToggle" type="checkbox" />
-        <span>
-          <strong>Show Now Playing</strong>
-          <small>Display the Now Playing block on the TV screen.</small>
-        </span>
-      </label>
-      <label class="source-toggle-card">
         <input id="showLogoToggle" type="checkbox" />
         <span>
           <strong>Show Logo</strong>
@@ -248,6 +218,27 @@
         <button id="saveLabels">Save label text</button>
       </details>
     </section>
+
+    <section class="panel">
+      <div class="panel-title-row">
+        <h2>Date &amp; Time</h2>
+
+        <label class="panel-visibility-toggle">
+          <input id="showClockToggle" type="checkbox" />
+          <span>Show on TV</span>
+        </label>
+      </div>
+
+      <p>
+        Controls the clock block shown on the TV screen. The clock uses the lab
+        timezone configured for this FabLabTV installation.
+      </p>
+
+      <p class="section-help">
+        Timezone is currently read from data/config.json. A Remote UI timezone picker
+        will need a small config save API before it can be edited here.
+      </p>
+    </section>    
 
     <section class="panel">
       <h2>Local Pulse Weather</h2>
@@ -276,7 +267,14 @@
     </section>
 
     <section id="local-messages" class="panel">
-      <h2>Custom Local Messages</h2>
+      <div class="panel-title-row">
+        <h2>Local Pulse</h2>
+
+        <label class="panel-visibility-toggle">
+          <input id="showLocalPulseToggle" type="checkbox" />
+          <span>Show on TV</span>
+        </label>
+      </div>
       <p>
         Add local notices for the TV, such as workshops, events, closures,
         reminders, visitor information, or anything staff want shown in Local Pulse.
@@ -287,12 +285,40 @@
         <label>Message<textarea id="messageBody" placeholder="Example: Intro to laser cutting, Thursday at 16:00"></textarea></label>
         <label>Optional image<input id="messageImage" type="file" accept="image/png,image/jpeg,image/webp,image/gif" /></label>
       </div>
-      <button id="addMessage">Add local message</button>
+      <button id="addMessage">Add Local Pulse item</button>
       <p id="messageUploadStatus" class="upload-status"></p>
     </section>
 
     <section class="panel">
-      <h2>Tech News History</h2>
+      <div class="panel-title-row">
+        <h2>Global Pulse</h2>
+
+        <label class="panel-visibility-toggle">
+          <input id="showGlobalPulseToggle" type="checkbox" />
+          <span>Show on TV</span>
+        </label>
+      </div>
+
+      <p>
+        Global Pulse shows stories, announcements, and activity from the wider
+        Fab Lab community around the world. It helps visitors discover projects,
+        labs, and developments beyond your local Fab Lab.
+      </p>
+
+      <p class="section-help">
+        Content is collected automatically. No local configuration is required.
+      </p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title-row">
+        <h2>Tech News</h2>
+
+        <label class="panel-visibility-toggle">
+          <input id="showTechNewsToggle" type="checkbox" />
+          <span>Show on TV</span>
+        </label>
+      </div>
       <div id="newsHistory" class="news-history"></div>
     </section>
   </main>

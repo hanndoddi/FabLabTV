@@ -796,3 +796,27 @@ select[multiple] {
 .audio-setup-notice.is-hidden {
   display: none;
 }
+
+.panel-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.panel-title-row h2 {
+  margin: 0;
+}
+
+.panel-visibility-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.panel-visibility-toggle input {
+  width: auto;
+}
