@@ -166,9 +166,17 @@ input, textarea, select {
 
 .hours-row {
   display: grid;
-  grid-template-columns: 120px 1fr auto 1fr 110px;
-  gap: 10px;
+  grid-template-columns: 132px 132px auto 132px 42px 110px;
+  gap: 8px;
   align-items: center;
+}
+
+.hours-row .add-hours-range {
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .editable-list {

@@ -162,6 +162,10 @@ function deleteJson(url) {
   return requestJson(url, { method: "DELETE" });
 }
 
+function isValidTime(value) {
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(String(value || ""));
+}
+
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
@@ -640,24 +644,28 @@ function renderOpeningHours(localConfig) {
   openingHoursEditor.innerHTML = "";
 
   for (const day of days) {
-    const range = weekly[day]?.[0] || {};
-    const row = document.createElement("div");
-    row.className = "hours-row";
-    row.dataset.day = day;
-    row.innerHTML = `
-      <strong>${day[0].toUpperCase()}${day.slice(1)}</strong>
-      <input class="open-time" type="time" value="${escapeHtml(range.open || "")}" />
-      <span>to</span>
-      <input class="close-time" type="time" value="${escapeHtml(range.close || "")}" />
-      <button class="small secondary clear-day" type="button">Closed</button>
-    `;
+    const ranges = weekly[day]?.length ? weekly[day] : [{}];
 
-    row.querySelector(".clear-day")?.addEventListener("click", () => {
-      row.querySelector(".open-time").value = "";
-      row.querySelector(".close-time").value = "";
-    });
+    for (const [index, range] of ranges.entries()) {
+      const row = document.createElement("div");
+      row.className = "hours-row";
+      row.dataset.day = day;
+      row.innerHTML = `
+        <strong>${index === 0 ? `${day[0].toUpperCase()}${day.slice(1)}` : ""}</strong>
+        <input class="open-time" type="text" inputmode="numeric" placeholder="HH:MM" value="${escapeHtml(range.open || "")}" />
+        <span>to</span>
+        <input class="close-time" type="text" inputmode="numeric" placeholder="HH:MM" value="${escapeHtml(range.close || "")}" />
+        <button class="small secondary add-hours-range" type="button" aria-label="Add another opening interval">+</button>
+        <button class="small secondary clear-day" type="button">Closed</button>
+      `;
 
-    openingHoursEditor.appendChild(row);
+      row.querySelector(".clear-day")?.addEventListener("click", () => {
+        row.querySelector(".open-time").value = "";
+        row.querySelector(".close-time").value = "";
+      });
+
+      openingHoursEditor.appendChild(row);
+    }
   }
 }
 
@@ -1077,13 +1085,41 @@ uploadStaff?.addEventListener("click", async () => {
   if (staffUploadNote) staffUploadNote.value = "";
 });
 
+openingHoursEditor?.addEventListener("click", (event) => {
+  const addButton = event.target.closest(".add-hours-range");
+  if (!addButton) return;
+
+  const row = addButton.closest(".hours-row");
+  if (!row) return;
+
+  const nextRow = row.cloneNode(true);
+  nextRow.dataset.day = row.dataset.day;
+  nextRow.querySelector("strong").textContent = "";
+  nextRow.querySelector(".open-time").value = "";
+  nextRow.querySelector(".close-time").value = "";
+
+  row.after(nextRow);
+});
+
 saveOpeningHours?.addEventListener("click", async () => {
   const weekly = {};
+
+  for (const day of days) {
+    weekly[day] = [];
+  }
 
   for (const row of openingHoursEditor.querySelectorAll(".hours-row")) {
     const open = row.querySelector(".open-time").value;
     const close = row.querySelector(".close-time").value;
-    weekly[row.dataset.day] = open && close ? [{ open, close }] : [];
+
+    if (open || close) {
+      if (!isValidTime(open) || !isValidTime(close)) {
+        window.alert("Opening hours must use 24-hour HH:MM format, for example 14:00.");
+        return;
+      }
+
+      weekly[row.dataset.day].push({ open, close });
+    }
   }
 
   await putJson("/api/local-pulse/opening-hours", { enabled: true, weekly });
