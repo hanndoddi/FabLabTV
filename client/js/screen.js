@@ -142,7 +142,7 @@ function updateStaticLabels() {
   if (onCallLabel) onCallLabel.textContent = t("onCall", "On Call");
   if (newsLabel) newsLabel.textContent = t("techNews", "Tech News");
   if (nowPlayingLabel) nowPlayingLabel.textContent = t("nowPlaying", "Now Playing");
-  if (nowPlayingType) nowPlayingType.textContent = t("fabAcademyProjectShowcase", "Fab Academy Project Showcase");
+  if (nowPlayingType) nowPlayingType.textContent = "";
   if (globalPulseLabel) globalPulseLabel.textContent = t("globalPulse", "Global Pulse");
   if (localPulseLabel) localPulseLabel.textContent = t("localPulse", "Local Pulse");
 }
@@ -168,18 +168,41 @@ function getEmptyVideoMessage() {
 function renderNowPlayingItem(item) {
   if (!item) {
     nowPlaying.textContent = getEmptyVideoMessage();
+    if (nowPlayingType) nowPlayingType.textContent = "";
     return;
   }
 
-  if (item.source === "fabacademy-highlights") {
-    nowPlaying.innerHTML = `
-      <span>${escapeHtml(item.title)}</span>
-      <small>${escapeHtml(item.subtitle || "Fab Academy Highlight")}</small>
-      <small>${escapeHtml(item.detail || "")}</small>
-    `;
-  } else {
-    nowPlaying.textContent = item.title;
+  const sourceLabels = {
+    local: "Local video",
+    "fabacademy-highlights": "Fab Academy Highlight",
+    "neil-project-picks": "Neil Project Pick",
+    slide: "Slide"
+  };
+
+  if (nowPlayingType) {
+    nowPlayingType.textContent = sourceLabels[item.source] || "";
   }
+
+  if (item.source === "fabacademy-highlights" || item.source === "neil-project-picks") {
+    const secondaryLine =
+      item.detail && item.detail !== item.title
+        ? item.detail
+        : item.projectTitle && item.projectTitle !== item.title
+          ? item.projectTitle
+          : item.mention && item.mention !== item.title
+            ? item.mention
+            : "";
+
+    nowPlaying.innerHTML = `
+      <span>${escapeHtml(item.title || "Untitled video")}</span>
+      ${secondaryLine ? `<small>${escapeHtml(secondaryLine)}</small>` : ""}
+      <small>${escapeHtml(item.labName || item.lab || "")}</small>
+      ${item.year ? `<small>${escapeHtml(item.year)}</small>` : ""}
+    `;
+    return;
+  }
+
+  nowPlaying.textContent = item.title || "Untitled video";
 }
 
 function startPlayback() {

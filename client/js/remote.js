@@ -184,12 +184,13 @@ function setSelectedOptions(select, values) {
   }
 }
 
-function titleCaseSlug(value) {
+function formatSlugLabel(value) {
   return String(value || "")
+    .replace(/\.[^/.]+$/, "")
     .replace(/[-_]+/g, " ")
     .replace(/\s+/g, " ")
     .trim()
-    .replace(/\b\w/g, (character) => character.toUpperCase());
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function renderRemoteNowPlaying(status) {
@@ -205,15 +206,34 @@ function renderRemoteNowPlaying(status) {
     return;
   }
 
-  const sourceLabel = item.source === "fabacademy-highlights"
-    ? "Fab Academy Highlight"
-    : "Local video";
+  const sourceLabels = {
+    local: "Local video",
+    "fabacademy-highlights": "Fab Academy Highlight",
+    "neil-project-picks": "Neil Project Pick",
+    slide: "Slide"
+  };
+
+  const sourceLabel = sourceLabels[item.source] || "Playlist item";
+
+  const secondaryLine =
+    item.detail && item.detail !== item.title
+      ? item.detail
+      : item.projectTitle && item.projectTitle !== item.title
+        ? item.projectTitle
+        : item.mention && item.mention !== item.title
+          ? item.mention
+          : "";
+
+  const metadataLines = [
+    secondaryLine,
+    item.labName || (item.lab ? formatSlugLabel(item.lab) : ""),
+    item.year ? String(item.year) : ""
+  ].filter(Boolean);
 
   remoteNowPlaying.innerHTML = `
     <div class="remote-now-label">Now playing on TV</div>
     <strong>${escapeHtml(item.title || "Untitled video")}</strong>
-    <span>${escapeHtml(item.subtitle || sourceLabel)}</span>
-    ${item.detail ? `<span>${escapeHtml(item.detail)}</span>` : ""}
+    ${metadataLines.map((line) => `<span>${escapeHtml(line)}</span>`).join("")}
     <span class="now-playing-meta">${escapeHtml(sourceLabel)}</span>
   `;
 }
@@ -448,7 +468,7 @@ function renderFabVideoCatalog(items = latestStatus?.fabAcademyHighlights?.items
     <article class="fab-video-item">
       <span class="fab-video-main">
         <strong>${escapeHtml(item.title || "Untitled")}</strong>
-        <small>${escapeHtml(item.labName || titleCaseSlug(item.lab))} • ${escapeHtml(item.year || "")}</small>
+        <small>${escapeHtml(item.labName || formatSlugLabel(item.lab))} • ${escapeHtml(item.year || "")}</small>
         ${item.detail || item.mention ? `<small>${escapeHtml(item.detail || item.mention)}</small>` : ""}
       </span>
       <button class="small play-highlight" type="button" data-id="${escapeHtml(item.id)}">Play now</button>
